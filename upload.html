@@ -1,132 +1,134 @@
 <html>
 <head>
-  <script type = "text/javascript" 
-         src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
-      </script>
-</head>
-   <body>
-      
-    <title>Upload new File</title>
-    <h1>Upload new Train File</h1>
-    <form method=post enctype=multipart/form-data action="http://127.0.0.1:5000/trainUpload">
-      <input type="file" name="file" id="file"><br>
-      <input type="button" value="Upload" onclick="uploadData();">
-      <br><p id="fileUpload"></p>
-    </form>
-  
-    <div id="tableDiv"></div>
-      <script>
-
-      	function createTable(data,metaData)
-      	{	
-      	var body = document.getElementsByTagName('body')[0];
-      		var tbl=document.createElement('table');
-  			var tblDiv = document.getElementById("tableDiv");
-  			tblDiv.innerHTML="";
-  			tbl.style.width = '100%';
-  			tbl.setAttribute('border', '1');
-  			var tbdy = document.createElement('tbody');
-  			var tr = document.createElement('tr');
-  			for (var j = 0; j < metaData.length; j++)
-    		{   
-    		var td = document.createElement('td');
-
-    			td.appendChild(document.createTextNode(metaData[j]));
-    			tr.appendChild(td);
-    		}
-    		
-    		tbdy.appendChild(tr);
-  			for (var i = 0; i < 5;i++)
-  			{
-    		var tr = document.createElement('tr');
-    		for (var j = 0; j < metaData.length; j++)
-    		{
-    		var td = document.createElement('td');
-        	td.appendChild(document.createTextNode(data[i][j]));
-        	tr.appendChild(td)
-        	}
-        	tbdy.appendChild(tr);
-        	}
-      		
-    		
-    		
-  			
-  			tbl.appendChild(tbdy);
-  			tblDiv.appendChild(tbl);
-  			body.appendChild(tblDiv);
-      	}
-
-
-      	function loadTrainData()
-      	{
-        var xhr = new XMLHttpRequest();
-        var url = "http://127.0.0.1:5000/trainHead";
-        xhr.open("GET", url, true);
-        //xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                var json = JSON.parse(xhr.responseText);
-                //alert(xhr.responseText);
-                console.log(xhr.responseText);
-                var data=json.data;
-                var metadata=json.metaData;
-                console.log(xhr.responseText);
-                createTable(data,metadata);
-            }
-        };
-        xhr.send();
-        
-   }
-      function uploadData()
-        {
-          //Limit the file size
-        var xhr = new XMLHttpRequest();
-        var url = "http://127.0.0.1:5000/trainUpload";
-        xhr.open("POST", url, true);
-        var file=document.getElementById("file").files[0];
-
-        var form_data = new FormData();
-        form_data.append('file',file);
-        console.log(form_data.length);
-        xhr.onreadystatechange = function () 
-        {
-            if (xhr.readyState === 4 && xhr.status === 200)
-             {
-               var uploadText=xhr.responseText;
-               var p = document.getElementById("fileUpload");
-               p.innerHTML="";
-               if (uploadText=="File uploaded successfully") 
-               {
-                p.innerHTML=uploadText;
-                   
-                  var xhr2 = new XMLHttpRequest();
-                  var url2 = "http://127.0.0.1:5000/trainHead";
-                  xhr2.open("GET", url2, true);
-        //xhr.setRequestHeader("Content-Type", "application/json");
-                  xhr2.onreadystatechange = function () 
-                  {
-                  if (xhr2.readyState === 4 && xhr2.status === 200) 
-                    {
-                      var json = JSON.parse(xhr2.responseText);
-                      var data=json.data;
-                      var metadata=json.metaData;
-                      createTable(data,metadata);
-                   }
-                  };
-                  xhr2.send();
-               }
-               else
-               {
-                p.innerHTML="<font color='red'>"+uploadText+"</font>";
-                var tblDiv = document.getElementById("tableDiv");
-                tblDiv.innerHTML="";
-              }
-              }
-        };
-        
-        xhr.send(form_data);
-        
-   }
+  <script type = "text/javascript"
+  src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
   </script>
-   </body>
+  <meta charset="utf-8"/>
+</head>
+<body>
+
+  <title>Upload new File</title>
+  <h1>Upload new Train File</h1>
+  <form method=post enctype=multipart/form-data action="http://127.0.0.1:5000/trainUpload">
+    <input type="file" name="file" id="file"><br>
+    <input type="button" value="Upload" onclick="uploadData();">
+    <br><p id="fileUpload"></p>
+  </form>
+
+  <div id="tableDiv"></div>
+  <script>
+
+  function createTable(data,metaData)
+  {
+    var body = document.getElementsByTagName('body')[0];
+    var tbl=document.createElement('table');
+    var tblDiv = document.getElementById("tableDiv");
+    tblDiv.innerHTML="";
+    tbl.style.width = '100%';
+    tbl.setAttribute('border', '1');
+    var tbdy = document.createElement('tbody');
+    var tr = document.createElement('tr');
+    for (var j = 0; j < metaData.length; j++)
+    {
+      var td = document.createElement('td');
+
+      td.appendChild(document.createTextNode(metaData[j]));
+      tr.appendChild(td);
+    }
+
+    tbdy.appendChild(tr);
+    for (var i = 0; i < 5;i++)
+    {
+      var tr = document.createElement('tr');
+      for (var j = 0; j < metaData.length; j++)
+      {
+        var td = document.createElement('td');
+        td.appendChild(document.createTextNode(data[i][j]));
+        tr.appendChild(td)
+      }
+      tbdy.appendChild(tr);
+    }
+
+
+
+
+    tbl.appendChild(tbdy);
+    tblDiv.appendChild(tbl);
+    body.appendChild(tblDiv);
+  }
+
+
+  function loadTrainData()
+  {
+    var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:5000/trainHead";
+    xhr.open("GET", url, true);
+    //xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        var json = JSON.parse(xhr.responseText);
+        //alert(xhr.responseText);
+        console.log(xhr.responseText);
+        var data=json.data;
+        var metadata=json.metaData;
+        console.log(xhr.responseText);
+        createTable(data,metadata);
+      }
+    };
+    xhr.send();
+
+  }
+  function uploadData()
+  {
+    //Limit the file size
+    var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:5000/trainUpload";
+    xhr.open("POST", url, true);
+    var file=document.getElementById("file").files[0];
+
+    var form_data = new FormData();
+    form_data.append('file',file);
+    form_data.append('headerFlag',"False");
+    xhr.onreadystatechange = function ()
+    {
+      if (xhr.readyState === 4 && xhr.status === 200)
+      {
+        var uploadText=xhr.responseText;
+        var p = document.getElementById("fileUpload");
+        p.innerHTML="";
+        if (uploadText=="File uploaded successfully")
+        {
+          p.innerHTML=uploadText;
+
+          var xhr2 = new XMLHttpRequest();
+          var url2 = "http://127.0.0.1:5000/trainHead";
+          xhr2.open("GET", url2, true);
+          //xhr.setRequestHeader("Content-Type", "application/json");
+          xhr2.onreadystatechange = function ()
+          {
+            if (xhr2.readyState === 4 && xhr2.status === 200)
+            {
+              var json = JSON.parse(xhr2.responseText);
+              //console.log(xhr2.responseText)
+              var data=json.data;
+              var metadata=json.metaData;
+              createTable(data,metadata);
+            }
+          };
+          xhr2.send();
+        }
+        else
+        {
+          p.innerHTML="<font color='red'>"+uploadText+"</font>";
+          var tblDiv = document.getElementById("tableDiv");
+          tblDiv.innerHTML="";
+        }
+      }
+    };
+
+    xhr.send(form_data);
+
+  }
+  </script>
+</body>
 </html>
