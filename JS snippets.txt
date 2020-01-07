@@ -1,0 +1,68 @@
+//Function to create table dynamically      
+  	function createTable(data,metaData)
+      	{	
+      	var body = document.getElementsByTagName('body')[0];
+      		var tbl=document.createElement('table');
+  			var tblDiv = document.getElementById("tableDiv");
+  			tblDiv.innerHTML="";
+  			tbl.style.width = '100%';
+  			tbl.setAttribute('border', '1');
+  			var tbdy = document.createElement('tbody');
+  			var tr = document.createElement('tr');
+  			for (var j = 0; j < metaData.length; j++)
+    		{   
+    		var td = document.createElement('td');
+
+    			td.appendChild(document.createTextNode(metaData[j]));
+    			tr.appendChild(td);
+    		}
+    		
+    		tbdy.appendChild(tr);
+  			for (var i = 0; i < 5;i++)
+  			{
+    		var tr = document.createElement('tr');
+    		for (var j = 0; j < metaData.length; j++)
+    		{
+    		var td = document.createElement('td');
+        	td.appendChild(document.createTextNode(data[i][j]));
+        	tr.appendChild(td)
+        	}
+        	tbdy.appendChild(tr);
+        	}
+      		
+    		
+    		
+  			
+  			tbl.appendChild(tbdy);
+  			tblDiv.appendChild(tbl);
+  			body.appendChild(tblDiv);
+      	}
+
+// Function to load data and send http request
+      	function loadData()
+      	{
+        var xhr = new XMLHttpRequest();
+        var url = "http://127.0.0.1:5000/loadData";
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var json = JSON.parse(xhr.responseText);
+                //alert(xhr.responseText);
+                console.log(xhr.responseText);
+                var train=json.trainData;
+                var test=json.testData;
+                var trainMetaData=json.metaData;
+                console.log(xhr.responseText);
+                createTable(train,trainMetaData);
+            }
+        };
+        var trainURL = document.getElementById("train").files[0].name;
+        var testURL = "train.csv";//document.getElementById("test").files[0].name;
+        //console.log(trainURL);
+        var data = JSON.stringify({"train": trainURL, "test": testURL});
+        //alert(trainURL);
+        //console.log(data);
+        xhr.send(data);
+        
+   }
