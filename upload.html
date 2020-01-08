@@ -194,7 +194,7 @@
 
     var form_data = new FormData();
     form_data.append('file',file);
-    form_data.append('headerFlag',"False");
+    form_data.append('headerFlag',"True");
     xhr.onreadystatechange = function ()
     {
       if (xhr.readyState === 4 && xhr.status === 200)
@@ -218,7 +218,7 @@
               //console.log(xhr2.responseText)
               var data=json.data;
               var metadata=json.metaData;
-              createTableCheck(data,metadata);
+              createTableRadio(data,metadata);
             }
           };
           xhr2.send();

@@ -58,6 +58,7 @@ def loadData(filename):
         df = pd.read_csv(fileURL)
     else:
         df = pd.read_csv(fileURL,header=None)
+    print(df.iloc[0])
     return df
 
 #Function to create file head and send it to front end
@@ -127,7 +128,10 @@ def removeColumns():
 @app.route('/data')
 def data():
     global traintData
+    global targetData
     print(trainData)
+    print(targetData)
+    
     
    
 if __name__ == '__main__':
