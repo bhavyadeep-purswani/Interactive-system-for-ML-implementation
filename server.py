@@ -21,6 +21,7 @@ ALLOWED_EXTENSIONS = {'csv', 'xls', 'txt', 'xlsx'}
 global trainFileName
 global trainData
 global trainDataDisplay
+global targetData
 
 
 #Function to check for valid extensions
@@ -56,6 +57,7 @@ def loadData(filename):
         df = pd.read_csv(fileURL)
     else:
         df = pd.read_csv(fileURL,header=None)
+    print(df.iloc[0])
     return df
 
 #Function to create file head and send it to front end
@@ -95,6 +97,40 @@ def trainUpload():
     r.mimetype = 'text/plain'
     return r
 
+#Function to select target attribute
+@app.route('/selectTargetAttribute',methods=['POST'])
+def selectTargetAttribute():
+    global trainData
+    global targetData
+    targetColumn=request.form['targetColumn']
+    if(isinstance(trainData.columns[0],str)==False):
+        targetColumn=int(targetColumn)    
+    targetData=trainData[targetColumn]
+    trainData.drop(targetColumn, axis=1, inplace=True)
+    return "Target Column Dropped"
+
+#Function to remove columns
+@app.route('/removeColumns',methods=['POST'])
+def removeColumns():
+    global trainData
+    removeColumns=request.form['removeColumns']
+    removeColumns=removeColumns.split(',')
+    if(isinstance(trainData.columns[0],str)==False):
+        removeColumns = list(map(int, removeColumns))
+    trainData.drop(removeColumns, axis=1, inplace=True)
+    return "successfully removed columns"
+    
+    
+    
+#function to display global variables
+@app.route('/data')
+def data():
+    global traintData
+    global targetData
+    print(trainData)
+    print(targetData)
+    
+    
    
 if __name__ == '__main__':
    app.run()
