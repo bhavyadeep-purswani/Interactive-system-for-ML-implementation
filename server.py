@@ -12,7 +12,6 @@ from flask_cors import CORS
 import json
 import os
 from werkzeug.utils import secure_filename
-import numpy as np
 
 #constants
 UPLOAD_FOLDER = '.\data'
@@ -92,7 +91,6 @@ def trainUpload():
     if fileName!=None:
         trainFileName=fileName
         trainData=loadData(trainFileName)
-        
     r = make_response(responseData)
     r.mimetype = 'text/plain'
     return r
