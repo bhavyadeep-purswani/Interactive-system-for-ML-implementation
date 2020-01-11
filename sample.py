@@ -6,5 +6,5 @@ Created on Tue Jan  7 17:34:05 2020
 """
 
 import pandas as pd
-df = pd.DataFrame(columns=5)
-df.head()
+df = pd.read_csv("train.csv")
+print(df.mode())

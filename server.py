@@ -12,7 +12,7 @@ from flask_cors import CORS
 import json
 import os
 from werkzeug.utils import secure_filename
-
+from sklearn import preprocessing
 #constants
 UPLOAD_FOLDER = '.\data'
 ALLOWED_EXTENSIONS = {'csv', 'xls', 'txt', 'xlsx'}
@@ -32,7 +32,7 @@ def allowed_file(filename):
 #Function to upload a file
 def uploadFile():
     responseData=""
-    
+    fileName=None
     if request.method == 'POST':
         if 'file' not in request.files:
             responseData,fileName="No file part",None
@@ -57,12 +57,11 @@ def loadData(filename):
         df = pd.read_csv(fileURL)
     else:
         df = pd.read_csv(fileURL,header=None)
-    print(df.iloc[0])
     return df
 
 #Function to create file head and send it to front end
 def fileHead(df):
-    df.fillna("null",inplace=True)
+    df=df.fillna("null")
     displayData=df.values.tolist()[0:5]
     metadata=list(df.columns)
     responseData={"data":displayData,"metaData":metadata}
@@ -70,7 +69,53 @@ def fileHead(df):
     r = make_response(responseData)
     r.mimetype = 'text/plain'
     return r
+
+#Function to check if data contains Null values
+def containsNull(data):
+    return any(data.isnull())
+
+#Function to fill the data with custom value
+def fillCustom(data,value):
+    data.fillna(value,inplace = True)
+    return data
+
+#Function to fill the data with Mean Value
+def fillMean(data):
+    data.fillna(data.mean(),inplace=True)
+    return data
+
+#Function to fill the data with Median Value
+def fillMedian(data):
+    data.fillna(data.median(),inplace=True)
+    return data
+
+#Function to fill the data with most common value
+def fillMostCommon(data):
+    data.fillna(data.mode().iloc[0],inplace = True)
+    return data
+
+#Function to drop rows that have null value corresponding to a column
+def dropNullRows(data,referenceColumn):
+    data.dropna(subset=list(referenceColumn),inplace=True)
+    return data
+
+#Function to forward fill the data
+def fillForward(data):
+    data.fillna(method="ffill",inplace = True)
+    return data
+
+#Function to backward fill the data
+def fillBackward(data):
+    data.fillna(method="bfill",inplace = True)
+    return data
+
+#Function to Label Encode Column
+def labelEncode(data):
+    labelEncoder = preprocessing.LabelEncoder()
+    data = labelEncoder.fit_transform(data)
+    return data
     
+
 
 #Flask Code
 app = Flask(__name__)
@@ -96,6 +141,7 @@ def trainUpload():
     r = make_response(responseData)
     r.mimetype = 'text/plain'
     return r
+
 
 #Function to select target attribute
 @app.route('/selectTargetAttribute',methods=['POST'])
@@ -125,7 +171,7 @@ def removeColumns():
 #function to display global variables
 @app.route('/data')
 def data():
-    global traintData
+    global trainData
     global targetData
     print(trainData)
     print(targetData)
