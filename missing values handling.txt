@@ -1,7 +1,0 @@
-drop row
-drop column
-drop column with all NaN value
-fill with previous/next value(only once disable after that)
-fill with most common
-fill with mean/median
-fill with custom value
