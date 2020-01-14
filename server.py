@@ -13,9 +13,11 @@ import json
 import os
 from werkzeug.utils import secure_filename
 from sklearn import preprocessing
+import requests
 #constants
 UPLOAD_FOLDER = '.\data'
 ALLOWED_EXTENSIONS = {'csv', 'xls', 'txt', 'xlsx'}
+GRAPH_URL = 'http://127.0.0.1:5001/loadGraphData'
 
 #global variables
 global trainFileName
@@ -165,16 +167,24 @@ def removeColumns():
         removeColumns = list(map(int, removeColumns))
     trainData.drop(removeColumns, axis=1, inplace=True)
     return "successfully removed columns"
-    
-    
-    
-#function to display global variables
+         
+#Function to display global variables
 @app.route('/data')
 def data():
     global trainData
     global targetData
     print(trainData)
     print(targetData)
+    
+#Function to display global variables
+@app.route('/callGraph')
+def callGraph():
+    global trainData
+    graphData=trainData.values.tolist()
+    requestData= {'graphData':graphData}
+    #requestData=json.dumps(requestData,ensure_ascii=True,allow_nan=True)
+    r = requests.post(url=GRAPH_URL, json=requestData)
+    return "Yes"
     
     
    
