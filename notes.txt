@@ -1,0 +1,8 @@
+list of plots:
+box plots
+correlation plots
+bar plot
+bubble
+scatter
+line
+

@@ -1,7 +1,7 @@
+
 # -*- coding: utf-8 -*-
 """
 Created on Sat Jan  4 19:33:27 2020
-
 @author: lekha
 """
 
@@ -13,7 +13,6 @@ import json
 import os
 from werkzeug.utils import secure_filename
 from sklearn import preprocessing
-import requests
 #constants
 UPLOAD_FOLDER = '.\data'
 ALLOWED_EXTENSIONS = {'csv', 'xls', 'txt', 'xlsx'}
@@ -24,7 +23,7 @@ global trainFileName
 global trainData
 global trainDataDisplay
 global targetData
-
+global preprocessingActions
 
 #Function to check for valid extensions
 def allowed_file(filename):
@@ -165,18 +164,35 @@ def removeColumns():
     removeColumns=removeColumns.split(',')
     if(isinstance(trainData.columns[0],str)==False):
         removeColumns = list(map(int, removeColumns))
+    preprocessingActions["removedColumns"]=removeColumns
     trainData.drop(removeColumns, axis=1, inplace=True)
     return "successfully removed columns"
-         
-#Function to display global variables
+    
+#Function for handling null value removal requests
+@app.route('/removeNullValue',methods=['POST'])
+def removeNullValues():
+    global trainData
+    if request.method == "POST":
+        columnName = request.form['columnName']
+        nullHandler = request.form['nullHandler']
+        if(isinstance(trainData.columns[0],str)==False):
+            columnName=int(columnName)    
+        if nullHandler == "fillForward":
+            trainData[columnName] = fillForward(columnName)
+        elif nullHandler == "fillBackward":
+            trainData[columnName] = fillBackward(columnName)
+        elif nullHandler == "fillMostCommon":
+            trainData[columnName] = fillMostCommon(columnName)
+    
+#function to display global variables
 @app.route('/data')
 def data():
     global trainData
     global targetData
     print(trainData)
     print(targetData)
-    
-#Function to display global variables
+
+#Function to call graph module
 @app.route('/callGraph')
 def callGraph():
     global trainData
@@ -190,3 +206,6 @@ def callGraph():
    
 if __name__ == '__main__':
    app.run()
+   preprocessingActions = dict()
+
+    
