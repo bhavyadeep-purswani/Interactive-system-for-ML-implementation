@@ -11,6 +11,7 @@ import pandas as pd
 from flask_cors import CORS
 import json
 import os
+import requests
 from werkzeug.utils import secure_filename
 from sklearn import preprocessing
 #constants

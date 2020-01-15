@@ -5,11 +5,21 @@
   </script>
   <meta charset="utf-8"/>
 </head>
-<body onload="loadTrainData();">
-	<div id="tableDiv"></div>
+<body onload="loadPage();">
+	<div id="tableDiv"></div><br>
+	<div id="plot">
+	<span>Select a Graph :</span>
+	<select name="selectPlot">
+      <option value="bar">Bar Graph</option>
+      <option value="scatter">Scatter Graph</option>
+      <option value="line">Line Graph</option>
+      <option value="box">Box Plot Graph</option>
+      <option value="correlation">Correlation Graph</option>
+    </select>
+    <button>Submit</button>
+	</div>
 	
-
-	<script type="text/javascript">
+<script type="text/javascript">
 	function createTable(data,metaData)
   {
     var body = document.getElementsByTagName('body')[0];
@@ -20,7 +30,7 @@
     tbl.setAttribute('border', '1');
     var tbdy = document.createElement('tbody');
     var tr = document.createElement('tr');
-    console.log(metaData);
+   
     for (var j = 0; j < metaData.length; j++)
     {
       var td = document.createElement('td');
@@ -44,11 +54,11 @@
     }
     tbl.appendChild(tbdy);
     tblDiv.appendChild(tbl);
-    body.appendChild(tblDiv);
+    
   }
 	
 		
-  function loadTrainData()
+  function loadTrainHead()
   {
     var xhr = new XMLHttpRequest();
     var url = "http://127.0.0.1:5000/trainHead";
@@ -68,7 +78,24 @@
     xhr.send();
 
   }
-
+  function loadGraphData()
+  {
+      var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:5000/callGraph";
+    xhr.open("GET", url, true);
+       xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200)
+       {
+        var json = xhr.responseText;
+      }
+    };
+    xhr.send();
+  }
+function loadPage()
+{
+loadGraphData();
+loadTrainHead();
+}
 	</script>
 </body>
 </html>
