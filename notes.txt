@@ -2,7 +2,6 @@ list of plots:
 box plots
 correlation plots
 bar plot
-
 scatter
 line
 

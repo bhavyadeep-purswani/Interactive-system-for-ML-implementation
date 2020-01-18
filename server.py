@@ -198,7 +198,9 @@ def data():
 def callGraph():
     global trainData
     graphData=trainData.values.tolist()
-    requestData= {'graphData':graphData}
+    graphMetaData=list(trainData.columns)
+    requestData= {'graphData':graphData, 'graphMetaData':graphMetaData}
+    print(graphMetaData)
     #requestData=json.dumps(requestData,ensure_ascii=True,allow_nan=True)
     r = requests.post(url=GRAPH_URL, json=requestData)
     return "Yes"

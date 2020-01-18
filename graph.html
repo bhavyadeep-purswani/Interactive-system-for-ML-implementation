@@ -9,16 +9,22 @@
 	<div id="tableDiv"></div><br>
 	<div id="plot">
 	<span>Select a Graph :</span>
-	<select name="selectPlot">
+	<select name="selectPlot" id="selectPlot">
       <option value="bar">Bar Graph</option>
       <option value="scatter">Scatter Graph</option>
       <option value="line">Line Graph</option>
       <option value="box">Box Plot Graph</option>
       <option value="correlation">Correlation Graph</option>
     </select>
-    <button>Submit</button>
+    <button onclick="sendGraphType();">Submit</button>
 	</div>
-	
+  <br><br>
+  <div id="rowColumn">
+	<div id="selectYdiv">Select Y attributes :<select id="selectY"></select></div><br><br>
+  <div id="selectXdiv">Select X attributes (Press Ctrl to select multiple attributes): 
+    <select id="selectX" multiple name="selectX[]"></select></div>
+  <button onclick="sendAttributes();">Submit</button>
+  </div>
 <script type="text/javascript">
 	function createTable(data,metaData)
   {
@@ -56,8 +62,37 @@
     tblDiv.appendChild(tbl);
     
   }
+	function selectRowColumn(x_attr,y_attr)
+  {
+    var div=document.getElementById('rowColumn');
+    div.style.display="block";
+    var selectYdiv=document.getElementById('selectYdiv');
+    var selectY = document.getElementById('selectY');
+    for (var i = 0; i<y_attr.length; i++)
+    {
+      var opt = document.createElement('option');
+      opt.appendChild(document.createTextNode(y_attr[i]));
+      opt.value = y_attr[i];
+      selectY.appendChild(opt);
+    }
+    selectYdiv.appendChild(selectY)
+
+   var selectXdiv=document.getElementById('selectXdiv');
+    var selectX = document.getElementById('selectX');
+    for (var i = 0; i<x_attr.length; i++)
+    {
+      var opt = document.createElement('option');
+      opt.appendChild(document.createTextNode(x_attr[i]));
+      opt.value = x_attr[i];
+      selectX.appendChild(opt);
+    }
+    selectXdiv.appendChild(selectX)
+
+  }
 	
-		
+
+
+
   function loadTrainHead()
   {
     var xhr = new XMLHttpRequest();
@@ -91,10 +126,73 @@
     };
     xhr.send();
   }
+  
+//function to send graph and recieve attributes
+function sendGraphType()
+{
+var graph = document.getElementById('selectPlot');
+var form_data = new FormData();
+    form_data.append('graph',graph.value);
+          var xhr = new XMLHttpRequest();
+          var url = "http://127.0.0.1:5001/graphType";
+          xhr.open("POST", url, true);
+          //xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.onreadystatechange = function ()
+          {
+            if (xhr.readyState === 4 && xhr.status === 200)
+            {
+              var json = JSON.parse(xhr.responseText);
+              //console.log(xhr2.responseText)
+              var x_attr=json.X;
+              var y_attr=json.Y;
+              selectRowColumn(x_attr,y_attr);
+            }
+          };
+          xhr.send(form_data);
+        } 
+
+function sendAttributes()
+{
+var y_attr=document.getElementById("selectY").value;
+var x_attr=[];
+var selectedValues = [];    
+    $("#selectX :selected").each(function(){
+        x_attr.push($(this).val()); 
+    });
+var form_data = new FormData();
+form_data.append('x_attr',x_attr);
+form_data.append('y_attr',y_attr);
+var xhr = new XMLHttpRequest();
+var url = "http://127.0.0.1:5001/plotGraph";
+xhr.open("POST", url, true);
+//xhr.setRequestHeader("Content-Type", "application/json");
+xhr.onreadystatechange = function ()
+  {
+    if (xhr.readyState === 4 && xhr.status === 200)
+      {
+        //var json = JSON.parse(xhr.responseText);
+        //console.log(xhr2.responseText)
+        var x=xhr.responseText;
+        var x_attr=json.X;
+        var y_attr=json.Y;
+        selectRowColumn(x_attr,y_attr);
+      }
+  };
+xhr.send(form_data);
+
+}
+  
+  
 function loadPage()
 {
 loadGraphData();
 loadTrainHead();
+
+
+
+//Disable the div tags
+var div=document.getElementById('rowColumn');
+div.style.display="none";
 }
 	</script>
 </body>
