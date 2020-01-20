@@ -8,10 +8,20 @@ from flask import Flask,request,make_response
 from flask_cors import CORS
 import pandas as pd
 import json
-
+import random
+import matplotlib.pyplot as plt,mpld3
 #Global data
 global data
 global graph
+
+#Other Functions
+
+#Function to generate random colours
+def hexColour():
+    r = lambda: random.randint(0,255)
+    s='#%02X%02X%02X' % (r(),r(),r())
+    return s
+
 
 #Flask Code
 app = Flask(__name__)
@@ -55,8 +65,19 @@ def plotGraph():
     x_attr=request.form['x_attr']
     x_attr=x_attr.split(',')
     if graph=="bar":
-        if len(x_attr):
-    return "Yes"
+        fig,ax = plt.subplots()
+        for i in range(len(x_attr)):
+            xColName=x_attr[i]
+            ax.bar(data[xColName].values.tolist(),data[y_attr].values.tolist(), width=0.8, color=hexColour(),label=xColName)
+        plt.legend(loc="upper right")
+        plt.ylabel(y_attr)
+        #plt.savefig("temp.png")
+        html=mpld3.fig_to_html(fig,figid='displayGraphOutput')
+        #print(html)
+        r = make_response(html)
+        r.mimetype = 'text/plain'
+    return r                
+    
         
         
         

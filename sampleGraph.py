@@ -4,7 +4,7 @@ Created on Thu Jan 16 15:14:11 2020
 
 @author: lekha
 """
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt,mpld3
 
 import json
 import pandas as pd
@@ -28,10 +28,17 @@ p.vbar(x='x',
                 width=5,source=source,color="#121AA1")
 show(p)
 
-ax = plt.subplot(111)
-#ax.bar(trainData.species.values.tolist(),trainData.sepal_length.values.tolist(), width=0.2, color='b', align='center')
-ax.bar(data.Id.values.tolist(),data.SalePrice.values.tolist(), width=0.2, color='#ff69b4', align='center')
+import random
+r = lambda: random.randint(0,255)
+s='#%02X%02X%02X' % (r(),r(),r())
 
+
+fig,ax = plt.subplots()
+ax.bar(data.MSSubClass.values.tolist(),data.SalePrice.values.tolist(), width=0.8, color='b',label='MSSubClass')
+ax.bar(data.Id.values.tolist(),data.SalePrice.values.tolist(), width=0.8, color='g',label='Id')
+plt.legend(loc="upper right")
+plt.ylabel('Sale Price')
+d=mpld3.fig_to_html(fig)
 
 plt.show()
 plt.bar(df,trainData.species.values.tolist())

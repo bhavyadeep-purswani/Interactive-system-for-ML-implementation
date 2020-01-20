@@ -25,6 +25,10 @@
     <select id="selectX" multiple name="selectX[]"></select></div>
   <button onclick="sendAttributes();">Submit</button>
   </div>
+  <div id="graphDiv">
+  <iframe id="displayGraphOutput" height="300" width="500"></iframe>
+  <img src="temp.png"/>
+  </div>
 <script type="text/javascript">
 	function createTable(data,metaData)
   {
@@ -170,12 +174,16 @@ xhr.onreadystatechange = function ()
   {
     if (xhr.readyState === 4 && xhr.status === 200)
       {
-        //var json = JSON.parse(xhr.responseText);
-        //console.log(xhr2.responseText)
-        var x=xhr.responseText;
-        var x_attr=json.X;
-        var y_attr=json.Y;
-        selectRowColumn(x_attr,y_attr);
+        //console.log(xhr.responseText);
+        //document.getElementById("displayGraphOutput").innerHTML=xhr.responseText;
+        var div=document.getElementById('graphDiv');
+        div.style.display="block";
+        var ifrm = document.getElementById('displayGraphOutput');
+        ifrm = ifrm.contentWindow || ifrm.contentDocument.document || ifrm.contentDocument;
+        ifrm.document.open();
+        ifrm.document.write("<html>"+xhr.responseText+"</html>");
+        ifrm.document.close();
+        
       }
   };
 xhr.send(form_data);
@@ -192,6 +200,8 @@ loadTrainHead();
 
 //Disable the div tags
 var div=document.getElementById('rowColumn');
+div.style.display="none";
+var div=document.getElementById('graphDiv');
 div.style.display="none";
 }
 	</script>
