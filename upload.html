@@ -17,7 +17,33 @@
 
   <div id="tableDiv"></div>
   <div id="remove"></div>
+  <div>
+    Split the data set:
+    <br>
+    Split Size:<br>
+    
+    <input type="radio" id="male" name="splitSizeType" value="default"><label for="male">Default</label><br>
+
+<input type="radio" id="customized" name="splitSizeType" value="customized"><label for="female">Customized</label>
+<input type="text" id="splitSizeNumber" name="splitSizeNumber"  class="other">
+<br>
+Random Seed: <br>
+<input type="radio" id="male" name="randomSeedType" value="default"><label for="male">Default</label><br>
+
+<input type="radio" id="customized" name="randomSeedType" value="customized"><label for="female">Customized</label>
+<input type="text" id="splitSizeNumber" name="randomSeedNumber"  class="other">
+<br>  Shuffle: <br>
+<input type="radio" id="male" name="shuffleSplit" value="true"><label for="male">True</label><br>
+
+<input type="radio" id="customized" name="shuffleSplit" value="false"><label for="female">False</label>
+ <br>
+<input type="button" value="Split" onclick="uploadData();">
+
+
+
+  </div>
   <script>
+
 
   function createTableRadio(data,metaData)
   {
@@ -156,6 +182,36 @@
     xhr.send(form_data);
 
   }
+
+ function splitData()
+  {
+    var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:5000/splitData";
+    xhr.open("POST", url, true);
+    //xhr.setRequestHeader("Content-Type", "application/json");
+   /* var split = document.getElementsByName('targetColumn'); 
+            for(i = 0; i < ele.length; i++)
+             { 
+                if(ele[i].checked) 
+                var targetColumn=ele[i].value; 
+            } */
+    var form_data = new FormData();
+    form_data.append('splitSizeType',"");
+    form_data.append('randomSeedType',"");
+    form_data.append('shuffleSplit',"");
+    form_data.append('splitSizeNumber',"");
+    form_data.append('randomSeedNumber',"");
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) 
+      {
+       var div=document.getElementById("remove");
+       div.innerHTML=xhr.responseText;
+      }
+    };
+    xhr.send(form_data);
+
+  }
+
 
   function removeColumns()
   {
