@@ -15,6 +15,9 @@ import requests
 from werkzeug.utils import secure_filename
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+
 #constants
 UPLOAD_FOLDER = '.\data'
 ALLOWED_EXTENSIONS = {'csv', 'xls', 'txt', 'xlsx'}
@@ -27,6 +30,14 @@ global trainDataDisplay
 global targetData
 global preprocessingActions
 global X_train, X_test, y_train, y_test
+
+
+#Function to convert strToBool
+def strToBool(s):
+    if(s=="True" or s=="true"):
+        return True
+    else:
+        return False
 
 #Function to check for valid extensions
 def allowed_file(filename):
@@ -226,7 +237,7 @@ def splitData():
         randomSeed=None
     else:
         randomSeed=int(randomSeedNumber)
-    if(shuffleSplit=="True"):
+    if(strToBool(shuffleSplit)):
         shuffle=True
     else:
         shuffle=False
@@ -236,8 +247,40 @@ def splitData():
     r = make_response(responseData)
     r.mimetype = 'text/plain'
     return r
+
+#Function to split data
+@app.route('/standardizeData',methods=['POST'])
+def standardizeData(): 
+    global trainData
+    standardizeType=request.form['standardizeType']
+    columnNames=request.form['columnNames'].split(",")
+    individualColumn=request.form['individualColumn']
+    if(standardizeType=="standard"):
+        scaler = StandardScaler()
+        if(strToBool(individualColumn)):
+            for col in columnNames:
+                trainData[col]=scaler.fit_transform(trainData[[col]])
+        else:
+            new = trainData[columnNames].copy()
+            scaler=scaler.fit(new)
+            trainData[columnNames]=scaler.transform(trainData[columnNames])
+    else:
+        scaler = MinMaxScaler()
+        if(strToBool(individualColumn)):
+            for col in columnNames:
+                trainData[col]=scaler.fit_transform(trainData[[col]])
+        else:
+            new = trainData[columnNames].copy()
+            scaler=scaler.fit(new)
+            trainData[columnNames]=scaler.transform(trainData[columnNames])
+    new = trainData[columnNames].copy()
+    responseData= {"standardData":new.values.tolist()[0:5]}
+    r = make_response(responseData)
+    r.mimetype = 'text/plain'
+    return r
+        
     
-    
+            
    
 if __name__ == '__main__':
    app.run()

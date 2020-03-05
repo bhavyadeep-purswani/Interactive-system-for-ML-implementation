@@ -27,5 +27,13 @@ Logistic regression-Classifier
 Linear regression-Regression
 xgboost -Both
 
+Standardization:
+MinMaxScaler
+StandardScaler
+
+For standardization call the train head with checkboxes on columns
+ and return list of column names(comma seperated value string), type of standardization "minmax" or "standard", standarize overall or
+ individual columns ("individualColumn" -"True" or "False")
+
 
 
