@@ -14,6 +14,10 @@ import os
 import requests
 from werkzeug.utils import secure_filename
 from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+
 #constants
 UPLOAD_FOLDER = '.\data'
 ALLOWED_EXTENSIONS = {'csv', 'xls', 'txt', 'xlsx'}
@@ -25,6 +29,15 @@ global trainData
 global trainDataDisplay
 global targetData
 global preprocessingActions
+global X_train, X_test, y_train, y_test
+
+
+#Function to convert strToBool
+def strToBool(s):
+    if(s=="True" or s=="true"):
+        return True
+    else:
+        return False
 
 #Function to check for valid extensions
 def allowed_file(filename):
@@ -200,7 +213,7 @@ def removeNullValues():
 def data():
     global trainData
     global targetData
-    print(trainData)
+        
     print(targetData)
 
 #Function to call graph module
@@ -214,8 +227,70 @@ def callGraph():
     #requestData=json.dumps(requestData,ensure_ascii=True,allow_nan=True)
     r = requests.post(url=GRAPH_URL, json=requestData)
     return "Yes"
+
+#Function to split data
+@app.route('/splitData',methods=['POST'])
+def splitData():
+    global trainData
+    global targetData
+    global X_train, X_test, y_train, y_test
+    splitSizeType=request.form['splitSizeType']
+    randomSeedType=request.form['randomSeedType']
+    shuffleSplit=request.form['shuffleSplit']
+    splitSizeNumber=request.form['splitSizeNumber']
+    randomSeedNumber=request.form['randomSeedNumber']
+    if(splitSizeType=="default"):
+        testSize=0.25
+    else:
+        testSize=float(splitSizeNumber)
+    if(randomSeedType=="default"):
+        randomSeed=None
+    else:
+        randomSeed=int(randomSeedNumber)
+    if(strToBool(shuffleSplit)):
+        shuffle=True
+    else:
+        shuffle=False
+    X_train, X_test, y_train, y_test=train_test_split(trainData, targetData, test_size=testSize, random_state=randomSeed,shuffle=shuffle)   
+    responseData= {"X_train":X_train.values.tolist()[0:5],"X_test": X_test.values.tolist()[0:5], "y_train":y_train.values.tolist()[0:5],"y_test": y_test.values.tolist()[0:5]}
+    responseData=json.dumps(responseData,ensure_ascii=True,allow_nan=True)
+    r = make_response(responseData)
+    r.mimetype = 'text/plain'
+    return r
+
+#Function to split data
+@app.route('/standardizeData',methods=['POST'])
+def standardizeData(): 
+    global trainData
+    standardizeType=request.form['standardizeType']
+    columnNames=request.form['columnNames'].split(",")
+    individualColumn=request.form['individualColumn']
+    if(standardizeType=="standard"):
+        scaler = StandardScaler()
+        if(strToBool(individualColumn)):
+            for col in columnNames:
+                trainData[col]=scaler.fit_transform(trainData[[col]])
+        else:
+            new = trainData[columnNames].copy()
+            scaler=scaler.fit(new)
+            trainData[columnNames]=scaler.transform(trainData[columnNames])
+    else:
+        scaler = MinMaxScaler()
+        if(strToBool(individualColumn)):
+            for col in columnNames:
+                trainData[col]=scaler.fit_transform(trainData[[col]])
+        else:
+            new = trainData[columnNames].copy()
+            scaler=scaler.fit(new)
+            trainData[columnNames]=scaler.transform(trainData[columnNames])
+    new = trainData[columnNames].copy()
+    responseData= {"standardData":new.values.tolist()[0:5]}
+    r = make_response(responseData)
+    r.mimetype = 'text/plain'
+    return r
+        
     
-    
+            
    
 if __name__ == '__main__':
    app.run()

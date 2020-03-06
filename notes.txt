@@ -5,3 +5,37 @@ bar plot
 scatter
 line
 
+Splitting of dataset
+default
+number - take test size between 0.0 to 1.0
+random
+
+random state seed
+default
+customized only integers	
+
+shuffle: true(default) or false
+
+Base paper algorithms
+SVM- Both
+Random Foreset Classifier
+Random Foreset Regression
+Knearest Classifier
+Gaussian Naive Bayes-Both
+Neural Network-Both
+Logistic regression-Classifier
+Linear regression-Regression
+xgboost -Both
+
+Standardization:
+MinMaxScaler
+StandardScaler
+
+For standardization call the train head with checkboxes on columns
+ and return list of column names(comma seperated value string), type of standardization "minmax" or "standard", standarize overall or
+ individual columns ("individualColumn" -"True" or "False")
+
+Give an option to opt out of standardization also
+
+
+
