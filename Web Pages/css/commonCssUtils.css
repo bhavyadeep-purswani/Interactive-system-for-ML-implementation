@@ -1,0 +1,31 @@
+* {
+  font-family: "Times New Roman";
+}
+body {
+  margin : 20px;
+}
+.heading-1 {
+  font-size: 30px;
+}
+.centered-text {
+  text-align: center;
+}
+.bold-text {
+  font-weight: bold;
+}
+.italics-text {
+  font-style: italic;
+}
+.normal-text {
+  font-size: 20px;
+}
+.margin-top-normal {
+  margin-top: 20px;
+}
+.element-center {
+  margin:0 auto;
+  display:block;
+}
+.margin-top-extra-large {
+  margin-top: 60px;
+}

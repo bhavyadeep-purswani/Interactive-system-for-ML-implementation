@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Data Upload</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <script src="js/jquery-3.4.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="css/fontawesome.css">
+  <link href="css/brands.css" rel="stylesheet">
+  <link href="css/solid.css" rel="stylesheet">
+  <script src="js/fontawesome.js"></script>
+  <link rel="stylesheet" href="css/commonCssUtils.css">
+  <style>
+  #uploadFileButton:hover {
+    background-color: #00b28f;
+  }
+  #uploadFileName {
+    margin-left: 10px;
+    font-family: sans-serif;
+    color: #aaa;
+  }
+  </style>
+</head>
+<body>
+  <div class="heading-1 centered-text bold-text">
+    Upload Dataset
+  </div>
+  <div class="normal-text element-center margin-top-extra-large">
+    <form method="post">
+      Select the database file:<br>
+      <input type="file" id="uploadedFile" hidden="hidden" />
+      <button type="button" class="btn btn-info" id="uploadFileButton">CHOOSE A FILE</button>
+      <span id="uploadFileName">No file chosen, yet.</span>
+    </form>
+  </div>
+  <script>
+  const realFileBtn = document.getElementById("uploadedFile");
+  const customBtn = document.getElementById("uploadFileButton");
+  const customTxt = document.getElementById("uploadFileName");
+
+  customBtn.addEventListener("click", function() {
+    realFileBtn.click();
+  });
+
+  realFileBtn.addEventListener("change", function() {
+    if (realFileBtn.value) {
+      customTxt.innerHTML = realFileBtn.value.match(
+        /[\/\\]([\w\d\s\.\-\(\)]+)$/
+      )[1];
+    } else {
+      customTxt.innerHTML = "No file chosen, yet.";
+    }
+  });
+
+  </script>
+</body>
+</html>

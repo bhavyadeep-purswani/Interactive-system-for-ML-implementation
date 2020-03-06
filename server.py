@@ -177,13 +177,23 @@ def removeNullValues():
         columnName = request.form['columnName']
         nullHandler = request.form['nullHandler']
         if(isinstance(trainData.columns[0],str)==False):
-            columnName=int(columnName)    
+            columnName=int(columnName) 
+        column = trainData[columnName]
         if nullHandler == "fillForward":
-            trainData[columnName] = fillForward(columnName)
+            trainData[columnName] = fillForward(column)
         elif nullHandler == "fillBackward":
-            trainData[columnName] = fillBackward(columnName)
+            trainData[columnName] = fillBackward(column)
         elif nullHandler == "fillMostCommon":
-            trainData[columnName] = fillMostCommon(columnName)
+            trainData[columnName] = fillMostCommon(column)
+        elif nullHandler == "fillMedian":
+            trainData[columnName] = fillMedian(column)
+        elif nullHandler == "fillMean":
+            trainData[columnName] = fillMean(column)
+        elif nullHandler == "fillCustom":
+            trainData[columnName] = fillCustom(column, request.form['customValue'])
+        elif nullHandler == "dropNullRows":
+            trainData[columnName] = dropNullRows(trainData, columnName)
+        
     
 #function to display global variables
 @app.route('/data')
