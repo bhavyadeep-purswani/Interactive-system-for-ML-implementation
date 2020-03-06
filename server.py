@@ -22,6 +22,117 @@ from sklearn.preprocessing import MinMaxScaler
 UPLOAD_FOLDER = '.\data'
 ALLOWED_EXTENSIONS = {'csv', 'xls', 'txt', 'xlsx'}
 GRAPH_URL = 'http://127.0.0.1:5001/loadGraphData'
+HYPERPARAMETERS={
+        "RandomForrestClassifier":{
+                "n_estimators":{
+                        "paramType":["int"],
+                        "options":[],
+                        "default":"100"
+                        },
+                 "max_depth":{
+                        "paramType":["int"],
+                        "options":[],
+                        "default":"None"
+                        },
+                 "min_samples_split":{
+                        "paramType":["float"],
+                        "options":[],
+                        "default":"2"
+                        },
+                 "min_samples_leaf":{
+                        "paramType":["float"],
+                        "options":[],
+                        "default":"1"
+                        },
+                 "max_features":{
+                        "paramType":["int","string"],
+                        "options":["auto","log2","sqrt"],
+                        "default":"auto"
+                        },
+                   
+                 "max_leaf_nodes":{
+                        "paramType":["int"],
+                        "options":[],
+                        "default":"None"
+                        }
+                 },
+        "KNeighborsClassifier":{
+                "n_neighbors":{
+                        "paramType":["int"],
+                        "options":[],
+                        "default":"5"
+                        },
+                   
+                "weights":{
+                        "paramType":["str"],
+                        "options":["uniform","distance"],
+                        "default":"uniform"
+                        },
+                "algorithm":{
+                       "paramType":["str"],
+                        "options":['auto', 'ball_tree', 'kd_tree', 'brute'],
+                        "default":"None"
+                        },
+                 "leaf_size":{
+                        "paramType":["int"],
+                        "options":[],
+                        "default":"30"
+                        }
+                 },
+            "RandomForrestRegressor":{
+                "n_estimators":{
+                        "paramType":["int"],
+                        "options":[],
+                        "default":"10"
+                        },
+                 "max_depth":{
+                        "paramType":["int"],
+                        "options":[],
+                        "default":"None"
+                        },
+                 "min_samples_leaf":{
+                        "paramType":["float"],
+                        "options":[],
+                        "default":"1"
+                        },
+                 "max_features":{
+                        "paramType":["int","string"],
+                        "options":["auto","log2","sqrt"],
+                        "default":"auto"
+                        },
+                   
+                 "max_leaf_nodes":{
+                        "paramType":["int"],
+                        "options":[],
+                        "default":"None"
+                        }
+                 },
+                 
+                 "LinearRegression":{
+                         "fit_intercept":{
+                             "paramType":["bool"],
+                             "options":[],
+                             "default":"True"
+                        }
+                    },
+                         
+                         
+       }
+                    
+                    
+                
+                
+                
+                
+                #[[],[]]
+                
+                
+                
+                }
+        
+        
+        
+        }
 
 #global variables
 global trainFileName
