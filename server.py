@@ -20,119 +20,11 @@ from sklearn.preprocessing import MinMaxScaler
 
 #constants
 UPLOAD_FOLDER = '.\data'
-ALLOWED_EXTENSIONS = {'csv', 'xls', 'txt', 'xlsx'}
+ALLOWED_EXTENSIONS = {'csv'}
 GRAPH_URL = 'http://127.0.0.1:5001/loadGraphData'
-HYPERPARAMETERS={
-        "RandomForrestClassifier":{
-                "n_estimators":{
-                        "paramType":["int"],
-                        "options":[],
-                        "default":"100"
-                        },
-                 "max_depth":{
-                        "paramType":["int"],
-                        "options":[],
-                        "default":"None"
-                        },
-                 "min_samples_split":{
-                        "paramType":["float"],
-                        "options":[],
-                        "default":"2"
-                        },
-                 "min_samples_leaf":{
-                        "paramType":["float"],
-                        "options":[],
-                        "default":"1"
-                        },
-                 "max_features":{
-                        "paramType":["int","string"],
-                        "options":["auto","log2","sqrt"],
-                        "default":"auto"
-                        },
-                   
-                 "max_leaf_nodes":{
-                        "paramType":["int"],
-                        "options":[],
-                        "default":"None"
-                        }
-                 },
-        "KNeighborsClassifier":{
-                "n_neighbors":{
-                        "paramType":["int"],
-                        "options":[],
-                        "default":"5"
-                        },
-                   
-                "weights":{
-                        "paramType":["str"],
-                        "options":["uniform","distance"],
-                        "default":"uniform"
-                        },
-                "algorithm":{
-                       "paramType":["str"],
-                        "options":['auto', 'ball_tree', 'kd_tree', 'brute'],
-                        "default":"None"
-                        },
-                 "leaf_size":{
-                        "paramType":["int"],
-                        "options":[],
-                        "default":"30"
-                        }
-                 },
-            "RandomForrestRegressor":{
-                "n_estimators":{
-                        "paramType":["int"],
-                        "options":[],
-                        "default":"10"
-                        },
-                 "max_depth":{
-                        "paramType":["int"],
-                        "options":[],
-                        "default":"None"
-                        },
-                 "min_samples_leaf":{
-                        "paramType":["float"],
-                        "options":[],
-                        "default":"1"
-                        },
-                 "max_features":{
-                        "paramType":["int","string"],
-                        "options":["auto","log2","sqrt"],
-                        "default":"auto"
-                        },
-                   
-                 "max_leaf_nodes":{
-                        "paramType":["int"],
-                        "options":[],
-                        "default":"None"
-                        }
-                 },
-                 
-                 "LinearRegression":{
-                         "fit_intercept":{
-                             "paramType":["bool"],
-                             "options":[],
-                             "default":"True"
-                        }
-                    },
-                         
-                         
-       }
-                    
-                    
-                
-                
-                
-                
-                #[[],[]]
-                
-                
-                
-                }
-        
-        
-        
-        }
+HYPERPARAMETERS=json.loads(open("hyperparamters.json","r").read()) 
+CALGORITHMS=["Random Forrest Classifier","KNeighbors Classifier","Logistic Regression","SVM","Gaussian Naive Bayes","Neural Network"]                 
+RALGORITHMS=["Random Forrest Regressor","Linear Regression","SVM","Gaussian Naive Bayes","Neural Network"]                 
 
 #global variables
 global trainFileName
@@ -145,7 +37,7 @@ global X_train, X_test, y_train, y_test
 
 #Function to convert strToBool
 def strToBool(s):
-    if(s=="True" or s=="true"):
+    if(s=="True" or s=="true" or s==True):
         return True
     else:
         return False
@@ -400,9 +292,39 @@ def standardizeData():
     r.mimetype = 'text/plain'
     return r
         
-    
-            
-   
+#Function to return list of algorithms based on type of algorithm
+@app.route('/getAlgorithms',methods=['POST'])
+def getAlgorithms(): 
+    typeAlgorithm=request.form['typeAlgorithm']
+    if(typeAlgorithm=="classification"):
+         responseData= {"algorithms":CALGORITHMS}
+    else:
+        responseData= {"algorithms":RALGORITHMS}
+    r = make_response(responseData)
+    r.mimetype = 'text/plain'
+    return r
+
+#Function to return list of hyperparameters based on algorithm
+@app.route('/getHyperparameters',methods=['POST'])            
+def getHyperparameters(): 
+    algorithm=request.form['algorithm']
+    responseData= {"hyperparameters":HYPERPARAMETERS[algorithm]}
+    print(request)
+    r = make_response(responseData)
+    r.mimetype = 'text/plain'
+    return r
+
+#Function to return prediction report
+@app.route('/getHyperparameters',methods=['POST'])            
+def getHyperparameters(): 
+    algorithm=request.form['algorithm']
+    responseData= {"hyperparameters":HYPERPARAMETERS[algorithm]}
+    print(request)
+    r = make_response(responseData)
+    r.mimetype = 'text/plain'
+    return r
+
+
 if __name__ == '__main__':
    app.run()
    preprocessingActions = dict()

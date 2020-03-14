@@ -17,15 +17,15 @@ customized only integers
 shuffle: true(default) or false
 
 Base paper algorithms
-SVM- Both
-Random Foreset Classifier
-Random Foreset Regression
-Knearest Classifier
-Gaussian Naive Bayes-Both
-Neural Network-Both
-Logistic regression-Classifier
-Linear regression-Regression
-xgboost -Both
+.SVM- Both
+.Random Foreset Classifier
+.Random Foreset Regression
+.Knearest Classifier
+.Gaussian Naive Bayes-Both
+.Neural Network-Both
+.Logistic regression-Classifier
+.Linear regression-Regression
+
 
 Standardization:
 MinMaxScaler
