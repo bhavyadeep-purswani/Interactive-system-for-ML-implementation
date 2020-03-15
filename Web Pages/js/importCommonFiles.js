@@ -19,9 +19,9 @@ loadjscssfile("css/commonCssUtils.css", "css");
 loadjscssfile("css/fontawesome.css", "css");
 loadjscssfile("css/brands.css", "css");
 loadjscssfile("css/solid.css", "css");
+loadjscssfile("js/CommonJsUtils.js", "js");
 setTimeout(() => {
   loadjscssfile("js/popper.min.js", "js");
   loadjscssfile("js/bootstrap.min.js", "js");
   loadjscssfile("js/fontawesome.js", "js");
-  loadjscssfile("js/CommonJsUtils.js", "js");
 }, 50);
