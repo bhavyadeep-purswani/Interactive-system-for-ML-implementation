@@ -28,13 +28,24 @@
       <div id="uploadFileName" class="margin-top-normal">No file chosen, yet.</div>
       <input type="checkbox" id="headerFlag" name="headerFlag" class="margin-top-normal" checked> File includes header<br>
       <button type="button" class="btn btn-primary" onclick="uploadData()">Proceed</button><br>
-      <div id="errorMsg" class="error-text margin-top-normal"></div>
+      <div id="errorMsg" class="error-text margin-top-normal"></div><br>
     </form>
+  </div>
+  <div class="normal-text bold-text" id = "selectTargetLabel">Select target Attribute:</div>
+  <div id = "dataHead">
+    <div id = "tableDiv">
+    </div>
+    <div id="errorMsgTarget" class="error-text margin-top-normal"></div><br>
   </div>
   <script>
 
   function init() {
     initFileButton();
+    hideSelectTargetLabel();
+  }
+
+  function hideSelectTargetLabel() {
+    document.getElementById("selectTargetLabel").style.display = "None";
   }
 
   function initFileButton() {
@@ -75,6 +86,7 @@
           if (uploadText=="File uploaded successfully")
           {
             addToSessionStorage("datasetUploaded", true);
+            loadDatasetHead();
           }
           else
           {
@@ -85,6 +97,118 @@
       xhr.send(form_data);
     } else {
       document.getElementById("errorMsg").innerHTML="No file Selected!";
+    }
+  }
+
+  function goToPreprocessing() {
+    var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:5000/getColumnsWithNullValues";
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function ()
+    {
+      if (xhr.readyState === 4)
+      {
+        if (xhr.status === 200) {
+          var response = JSON.parse(xhr.responseText);
+          if (response.columnList.length != 0) {
+            addToSessionStorage("columnsWithNullValus", xhr.responseText);
+            window.location = "handleNull.html";
+          }
+        } else {
+          goToPreprocessing();
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  function loadDatasetHead() {
+    document.getElementById("selectTargetLabel").style.display = "block";
+    var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:5000/trainHead";
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        var json = JSON.parse(xhr.responseText);
+        var data=json.data;
+        var metadata=json.metaData;
+        createTableRadio(data,metadata);
+      }
+    };
+    xhr.send();
+  }
+
+  function createTableRadio(data,metaData)
+  {
+    var tbl=document.createElement('table');
+    var tblDiv = document.getElementById("tableDiv");
+    var dataHead = document.getElementById("dataHead");
+    tblDiv.innerHTML="";
+    tbl.style.width = '100%';
+    tbl.setAttribute('class', 'table table-bordered table-striped');
+    tblDiv.setAttribute('style', "overflow-x:auto;");
+    var thead = document.createElement('thead');
+    var tbdy = document.createElement('tbody');
+    var tr = document.createElement('tr');
+    for (var j = 0; j < metaData.length; j++)
+    {
+      var th = document.createElement('th');
+      th.appendChild(document.createTextNode(metaData[j]));
+      var input= document.createElement('input');
+      input.setAttribute('type','radio');
+      input.setAttribute('name','targetColumn');
+      input.setAttribute('value',metaData[j]);
+      input.setAttribute('style',"display:inline;");
+      th.appendChild(input);
+      tr.appendChild(th);
+    }
+    thead.appendChild(tr);
+    tbl.appendChild(thead);
+    for (var i = 0; i < data.length;i++)
+    {
+      var tr = document.createElement('tr');
+      for (var j = 0; j < metaData.length; j++)
+      {
+        var td = document.createElement('td');
+        td.appendChild(document.createTextNode(data[i][j]));
+        tr.appendChild(td)
+      }
+      tbdy.appendChild(tr);
+    }
+    tbl.appendChild(tbdy);
+    tblDiv.appendChild(tbl);
+    var input= document.createElement('button');
+    input.setAttribute('type','button');
+    input.setAttribute('onclick','targetAttribute();');
+    input.setAttribute('class','btn btn-primary element-center margin-top-normal');
+    input.innerHTML= "Proceed"
+    dataHead.appendChild(input);
+  }
+
+  function targetAttribute()
+  {
+    var ele = document.getElementsByName('targetColumn');
+    var targetColumn = null;
+    for(i = 0; i < ele.length; i++)
+    {
+      if(ele[i].checked)
+      targetColumn=ele[i].value;
+    }
+    if (targetColumn == null) {
+      document.getElementById("errorMsgTarget").innerHTML = "Please select a Target Attribute";
+    } else {
+      var xhr = new XMLHttpRequest();
+      var url = "http://127.0.0.1:5000/selectTargetAttribute";
+      xhr.open("POST", url, true);
+      var form_data = new FormData();
+      form_data.append('targetColumn',targetColumn);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200)
+        {
+          goToPreprocessing();
+        }
+      };
+      xhr.send(form_data);
     }
   }
 

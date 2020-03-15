@@ -345,7 +345,14 @@ def removeNullValues():
         elif nullHandler == "dropNullRows":
             dataset[columnName] = dropNullRows(dataset, columnName)
         
-    
+@app.route('/getColumnsWithNullValues')
+def columnsWithNullVaues():
+    global dataset
+    columns = []
+    for column in dataset.columns:
+        if containsNull(dataset[column]):
+            columns.append(column)
+    return json.dumps({'columnList':columns},ensure_ascii=True, allow_nan=True)
 #function to display global variables
 @app.route('/data')
 def data():

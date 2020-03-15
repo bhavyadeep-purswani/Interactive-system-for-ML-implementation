@@ -4,17 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Interactive System for ML implementation</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <script src="js/jquery-3.4.1.min.js"></script>
-  <script src="js/popper.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="css/fontawesome.css">
-  <link href="css/brands.css" rel="stylesheet">
-  <link href="css/solid.css" rel="stylesheet">
-  <script src="js/fontawesome.js"></script>
-  <link rel="stylesheet" href="css/commonCssUtils.css">
+  <script src="js/importCommonFiles.js" type="text/javascript"></script>
 </head>
-<body>
+<body onload="init()" onunload="initializeStorage()">
   <div class="heading-1 centered-text bold-text">
     Interactive System for ML implementation
   </div>
@@ -27,5 +19,12 @@
     onclick="window.location.href = 'uploadData.html';">
     Let's Start <i class="fas fa-chevron-right"></i>
   </button>
+  <script>
+    function init() {
+    }
+    function initializeStorage() {
+      addToSessionStorage("datasetUploaded", false);
+    }
+  </script>
 </body>
 </html>
