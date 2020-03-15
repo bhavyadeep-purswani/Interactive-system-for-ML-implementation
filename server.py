@@ -197,7 +197,7 @@ def uploadFile(ALLOWED_EXTENSIONS):
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 responseData,fileName="File uploaded successfully",filename
             else:
-                responseData,fileName="In valid Extension",None
+                responseData,fileName="Invalid Extension",None
         else:
             responseData,fileName="Error in uploading file",None
     return responseData,fileName

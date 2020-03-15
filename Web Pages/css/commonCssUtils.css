@@ -29,3 +29,10 @@ body {
 .margin-top-extra-large {
   margin-top: 60px;
 }
+.error-text {
+  color: red;
+  font-size: 15px;
+}
+.inline-text {
+  display: inline;
+}
