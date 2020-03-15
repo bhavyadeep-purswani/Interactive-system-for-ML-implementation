@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b9451436-3d47-4b03-b40d-d7113039112e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Web Pages/js/CommonJsUtils.js" beforeDir="false" afterPath="$PROJECT_DIR$/Web Pages/js/CommonJsUtils.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web Pages/js/importCommonFiles.js" beforeDir="false" afterPath="$PROJECT_DIR$/Web Pages/js/importCommonFiles.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web Pages/landing.html" beforeDir="false" afterPath="$PROJECT_DIR$/Web Pages/landing.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Web Pages/uploadData.html" beforeDir="false" afterPath="$PROJECT_DIR$/Web Pages/uploadData.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server.py" afterDir="false" />
-    </list>
+    <list default="true" id="b9451436-3d47-4b03-b40d-d7113039112e" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
