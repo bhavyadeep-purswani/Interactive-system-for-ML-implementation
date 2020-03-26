@@ -39,7 +39,7 @@ Random Seed: <br>
  <br>
 <input type="button" value="Split" onclick="uploadData();">
 
-
+<button onclick="loadTrainData();" >File head</button>
 
   </div>
   <script>
@@ -151,7 +151,7 @@ Random Seed: <br>
         var data=json.data;
         var metadata=json.metaData;
         console.log(xhr.responseText);
-        createTable(data,metadata);
+        createTableRadio(data,metadata);
       }
     };
     xhr.send();

@@ -15,6 +15,7 @@ import os
 import requests
 from werkzeug.utils import secure_filename
 from sklearn import preprocessing
+from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
@@ -32,7 +33,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_recall_fscore_support
 
 #constants
-UPLOAD_FOLDER = '.\data'
+#UPLOAD_FOLDER = '.\data' #For windows
+UPLOAD_FOLDER='data'
 ALLOWED_EXTENSIONS = {'csv'}
 GRAPH_URL = 'http://127.0.0.1:5001/loadGraphData'
 HYPERPARAMETERS=json.loads(open("hyperparamters.json","r").read()) 
@@ -204,7 +206,8 @@ def uploadFile(ALLOWED_EXTENSIONS):
 
 #Load data and convert it into dataframe
 def loadData(filename,headerFlag):
-    fileURL=UPLOAD_FOLDER+"\\"+filename
+    fileURL=UPLOAD_FOLDER+"/"+filename #Ubuntu
+    #fileURL=UPLOAD_FOLDER+"\\"+filename #Windows
     if headerFlag == True:
         df = pd.read_csv(fileURL)
     else:
@@ -265,8 +268,28 @@ def fillBackward(data):
 def labelEncode(data):
     labelEncoder = preprocessing.LabelEncoder()
     data = labelEncoder.fit_transform(data)
-    return data
-    
+    return data,labelEncoder
+
+
+#Function to one hot encode
+def oneHotEncode(data):
+    enc = OneHotEncoder(handle_unknown='ignore')
+    enc.fit(data)
+    data=enc.transform(data).toarray()
+    df=pd.DataFrame(data,columns=enc.categories_)
+    return df,enc
+
+#function which returns if function contains a list
+def checkForStrings(data):
+    dtype=data.dtypes
+    columns=[]
+    for col in data.columns.values:
+        val=str(dtype[col])
+        if val=="string" or val=="object":
+            columns.append(col)
+    return columns
+
+
 
 
 #Flask Code
@@ -280,7 +303,7 @@ def trainHead():
     global dataset
     r=fileHead(dataset)
     return r   
-    
+
 #Function for uploading and loading the file into dataframe               
 @app.route('/trainUpload',methods=['POST'])
 def trainUpload():
@@ -324,6 +347,7 @@ def removeColumns():
 @app.route('/removeNullValue',methods=['POST'])
 def removeNullValues():
     global dataset
+
     if request.method == "POST":
         columnName = request.form['columnName']
         nullHandler = request.form['nullHandler']
@@ -343,8 +367,51 @@ def removeNullValues():
         elif nullHandler == "fillCustom":
             dataset[columnName] = fillCustom(column, request.form['customValue'])
         elif nullHandler == "dropNullRows":
-            dataset[columnName] = dropNullRows(dataset, columnName)
-        
+            dataset = dropNullRows(dataset, columnName)
+
+    return "Success"
+
+#Api to one hot encode
+@app.route('/oneHotEncodeColumns',methods=['POST'])
+def oneHotEncodeColumns():
+    global dataset
+    columnNames = request.form['columnNames'].split(",")
+    for col in columnNames:
+        df,enc=oneHotEncode(dataset[[col]])
+        dataset = dataset.drop(columns=col)
+        dataset = pd.concat([dataset, df], axis=1)
+    return "Success"
+
+#Api to get string
+@app.route('/getStringColumns',methods=['GET'])
+def getStringColumns():
+    global dataset
+    columnNames = checkForStrings(dataset)
+    return json.dumps({'columnList':columnNames},ensure_ascii=True, allow_nan=True)
+
+#Api to label encode
+@app.route('/labelEncodeColumns',methods=['GET'])
+def labelEncodeColumns():
+    global dataset
+    columnNames = checkForStrings(dataset)
+    for col in columnNames:
+        data,labelEncoder=labelEncode(dataset[[col]])
+        dataset[col]=data
+    return "Success"
+
+
+
+#Function to return if any column contains null
+@app.route('/getNullValue',methods=['POST'])
+def getNullValue():
+    global dataset
+    column = request.form['columnName']
+    if containsNull(dataset[column]):
+        return "True"
+    else:
+        return "False"
+
+
 @app.route('/getColumnsWithNullValues')
 def columnsWithNullVaues():
     global dataset

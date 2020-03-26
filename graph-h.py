@@ -12,7 +12,7 @@ from bokeh.io import show, output_file
 from bokeh.plotting import figure
 from flask import Flask, request, make_response
 from flask_cors import CORS
-
+from bokeh.models.annotations import Title
 #Global data
 global data
 global graph
@@ -129,9 +129,10 @@ def plotGraph():
     y_attr=request.form['y_attr']
     x_attr=request.form['x_attr']
     x_attr=x_attr.split(',')
+    t = Title()
     if graph=="bar":
         df=data
-        output_file("graph2.html")
+
         p = figure(plot_width=1000, plot_height=1000)
         xlabel=""
         for attr in range(len(x_attr)):
@@ -140,10 +141,15 @@ def plotGraph():
             xlabel+=x_attr[attr]
         p.xaxis.axis_label =xlabel
         p.yaxis.axis_label = y_attr
+        title=graph+" "+xlabel+" "+p.yaxis.axis_label
+        t.text = title
+        p.title = t
+        output_file("graph2.html",title=title)
         show(p)
     if graph=="scatter":
+
         df=data
-        output_file("graph2.html")
+
         p = figure(plot_width=600, plot_height=600)
         print(x_attr[0])
         print(y_attr)
@@ -152,24 +158,35 @@ def plotGraph():
         p.square(data[x_attr[0]], data[y_attr], size=20, color=hexColour(),legend=x_attr[0])
         p.xaxis.axis_label =x_attr[0]
         p.yaxis.axis_label = y_attr
+        title = graph + " " + p.xaxis.axis_label + " " + p.yaxis.axis_label
+        t.text = title
+        p.title = t
+        output_file("graph2.html", title=title)
         show(p)
     if graph=="line":
         df=data
-        output_file("graph2.html")
+
         p = figure(plot_width=600, plot_height=600)
         p.line(data[x_attr[0]], data[y_attr],color=hexColour(),legend=x_attr[0])
         p.xaxis.axis_label =x_attr[0]
         p.yaxis.axis_label = y_attr
+        t.text =title
+        p.title = t
         show(p)
     if graph=="box":
         df=data
-        output_file("graph2.html")
+        title=graph+" " + x_attr[0] +" "+ y_attr
         p = figure(plot_width=600, plot_height=600)
         p.line(data[x_attr[0]], data[y_attr],color=hexColour(),legend=x_attr[0])
+
+        title = graph + " " + p.xaxis.axis_label + " " + p.yaxis.axis_label
+        t.text = title
+        p.title = t
+        output_file("graph2.html", title=title)
         show(p)
     if graph=="correlation":
         df=data
-        output_file("graph2.html")
+
         p = figure(plot_width=600, plot_height=600)
         xlabel=""
         for attr in range(len(x_attr)):
@@ -178,8 +195,12 @@ def plotGraph():
             xlabel+=x_attr[attr]
         p.xaxis.axis_label =xlabel
         p.yaxis.axis_label = y_attr
+        title = graph + " " + p.xaxis.axis_label + " " + p.yaxis.axis_label
+        t.text = title
+        p.title = t
+        output_file("graph2.html", title=title)
         show(p)
-    return r                
+    return "Done"
     
         
         
