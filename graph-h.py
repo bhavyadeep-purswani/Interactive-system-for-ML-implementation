@@ -144,7 +144,7 @@ def plotGraph():
         title=graph+" "+xlabel+" "+p.yaxis.axis_label
         t.text = title
         p.title = t
-        output_file("graph2.html",title=title)
+        output_file("misc/graph2.html", title=title)
         show(p)
     if graph=="scatter":
 
@@ -161,7 +161,7 @@ def plotGraph():
         title = graph + " " + p.xaxis.axis_label + " " + p.yaxis.axis_label
         t.text = title
         p.title = t
-        output_file("graph2.html", title=title)
+        output_file("misc/graph2.html", title=title)
         show(p)
     if graph=="line":
         df=data
@@ -182,7 +182,7 @@ def plotGraph():
         title = graph + " " + p.xaxis.axis_label + " " + p.yaxis.axis_label
         t.text = title
         p.title = t
-        output_file("graph2.html", title=title)
+        output_file("misc/graph2.html", title=title)
         show(p)
     if graph=="correlation":
         df=data
@@ -198,7 +198,7 @@ def plotGraph():
         title = graph + " " + p.xaxis.axis_label + " " + p.yaxis.axis_label
         t.text = title
         p.title = t
-        output_file("graph2.html", title=title)
+        output_file("misc/graph2.html", title=title)
         show(p)
     return "Done"
     

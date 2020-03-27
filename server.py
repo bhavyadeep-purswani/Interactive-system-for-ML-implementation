@@ -295,8 +295,10 @@ def predictFile():
 @app.route('/downloadPrediction')
 def downloadPrediction():
     global predictedData
-    pd.DataFrame(predictedData).to_csv(".\data\predictions.csv")
-    return send_file(".\data\\predictions.csv", as_attachment=True)
+    #pd.DataFrame(predictedData).to_csv(".\generated\predictions.csv") #Windows
+    #return send_file(".\generated\\predictions.csv", as_attachment=True) #For windows
+    pd.DataFrame(predictedData).to_csv("generated/predictions.csv")
+    return send_file("generated/predictions.csv", as_attachment=True)
 
     
    

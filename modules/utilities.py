@@ -21,12 +21,12 @@ def checkForStrings(data):
 
 def fetchPreProcessData(params,preprocessingActions):
     preprocessingActions+="\n\treturn dataset"
-    f=open('preProcessActions.py','w+')
+    f=open('generated/preProcessActions.py','w+')
     f.write(preprocessingActions)
     f.close()
-    import preProcessActions
-    preProcessActions=reload(preProcessActions)
-    return preProcessActions.preprocess(params)
+    import generated.preProcessActions
+    generated.preProcessActions = reload(generated.preProcessActions)
+    return generated.preProcessActions.preprocess(params)
 
 
 def appendAllNulls(preprocessingActions):
