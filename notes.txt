@@ -38,4 +38,13 @@ For standardization call the train head with checkboxes on columns
 Give an option to opt out of standardization also
 
 
+Important
+handle the integer column names of dataframe
+
+additional check should be performed for fill median and fill mean if string do not allow
+
+run one loop afterwards to fill in all remaining in test to perform a fillCommon
+
+perform checks when custom values r given for null value
+
 

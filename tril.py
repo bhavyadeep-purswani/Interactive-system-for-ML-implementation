@@ -2,6 +2,7 @@ from jinja2 import Environment, FileSystemLoader
 from flask import Flask
 import pandas as pd
 import numpy as np
+from modules.preprocess import *
 
 
 dataset = pd.DataFrame(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]),
@@ -17,3 +18,5 @@ from generated import showpersons
 x=showpersons.preprocess(params)
 print(x,type(x))
 
+for x in dataset.columns:
+    print(dataset[x])

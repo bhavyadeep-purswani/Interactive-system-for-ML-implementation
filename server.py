@@ -5,17 +5,17 @@ Created on Sat Jan  4 19:33:27 2020
 @author: lekha
 """
 
-from flask import Flask,request,make_response,send_file
+from flask import Flask, request, make_response, send_file
 import pandas as pd
 from flask_cors import CORS
 import json
 import requests
 from sklearn.model_selection import train_test_split
-from modules.MLModelProcessing import createModel, createModelFit, evaluateModel, predict
+from modules.MLModelProcessing import createModel, createModelFit, evaluateModel
 from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERS, CALGORITHMS, RALGORITHMS
 from modules.fileprocessing import loadData, fileHead, uploadFile
 from modules.preprocess import standardizeData, containsNull, fillCustom, fillMean, fillMedian, fillMostCommon, dropNullRows, fillForward, fillBackward, labelEncode, oneHotEncode
-from modules.utilities import strToBool, checkForStrings
+from modules.utilities import strToBool, checkForStrings, fetchPreProcessData, appendAllNulls
 
 #global variables
 global trainFileName
@@ -27,11 +27,19 @@ global X_train, X_test, y_train, y_test
 global mod
 global modFit
 global predictedData
+global preprocessingActions
+global params
+
+#params={}
+#preprocessingActions = "from modules.preprocess import *\nimport server\nimport pandas as pd\ndef preprocess(params):\n\tdataset=params['dataset']"
+
 
 #Flask Code
 app = Flask(__name__)
 CORS(app)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
 
 #Function to return the head of dataframe
 @app.route('/trainHead',methods=['GET'])
@@ -44,14 +52,16 @@ def trainHead():
 @app.route('/trainUpload',methods=['POST'])
 def trainUpload():
     global trainFileName
-    global dataset
+    global dataset,params,preprocessingActions
     headerFlag= strToBool(request.form["headerFlag"])
     responseData,fileName= uploadFile(ALLOWED_EXTENSIONS, app.config['UPLOAD_FOLDER'])
     if fileName!=None:
         trainFileName=fileName
         dataset= loadData(trainFileName, headerFlag)
-    r = make_response(responseData)
-    r.mimetype = 'text/plain'
+        params={}
+        preprocessingActions = "from modules.preprocess import *\nimport server\nimport pandas as pd\ndef preprocess(params):\n\tdataset=params['dataset']"
+        r = make_response(responseData)
+        r.mimetype = 'text/plain'
     return r
 
 
@@ -71,18 +81,20 @@ def selectTargetAttribute():
 @app.route('/removeColumns',methods=['POST'])
 def removeColumns():
     global dataset
+    global preprocessingActions,params
     removeColumns=request.form['removeColumns']
     removeColumns=removeColumns.split(',')
+    removeColumns=[x.strip() for x in removeColumns]
     if(isinstance(dataset.columns[0],str)==False):
         removeColumns = list(map(int, removeColumns))
-    preprocessingActions["removedColumns"]=removeColumns
     dataset.drop(removeColumns, axis=1, inplace=True)
+    preprocessingActions+="\n\tdataset.drop({0},axis=1,inplace=True)".format(str(removeColumns))
     return "successfully removed columns"
     
 #Function for handling null value removal requests
 @app.route('/removeNullValue',methods=['POST'])
 def removeNullValues():
-    global dataset
+    global dataset,preprocessingActions,params
 
     if request.method == "POST":
         columnName = request.form['columnName']
@@ -92,30 +104,46 @@ def removeNullValues():
         column = dataset[columnName]
         if nullHandler == "fillForward":
             dataset[columnName] = fillForward(column)
+            preprocessingActions += "\n\tdataset['{0}']=fillForward(dataset['{0}'])".format(columnName)
         elif nullHandler == "fillBackward":
             dataset[columnName] = fillBackward(column)
+            preprocessingActions += "\n\tdataset['{0}']=fillBackward(dataset['{0}'])".format(columnName)
         elif nullHandler == "fillMostCommon":
             dataset[columnName] = fillMostCommon(column)
+            preprocessingActions += "\n\tdataset['{0}']=fillMostCommon(dataset['{0}'])".format(columnName)
         elif nullHandler == "fillMedian":
             dataset[columnName] = fillMedian(column)
+            preprocessingActions += "\n\tdataset['{0}']=fillMedian(dataset['{0}'])".format(columnName)
         elif nullHandler == "fillMean":
             dataset[columnName] = fillMean(column)
+            preprocessingActions += "\n\tdataset['{0}']=fillMean(dataset['{0}'])".format(columnName)
         elif nullHandler == "fillCustom":
-            dataset[columnName] = fillCustom(column, request.form['customValue'])
+            if(str(dataset.dtypes[columnName])=='object'):
+                dataset[columnName] = fillCustom(column, str(request.form['customValue']))
+                preprocessingActions += "\n\tdataset['{0}']=fillCustom(dataset['{0}'],'{1}')".format(columnName,request.form['customValue'])
+            else:
+                dataset[columnName] = fillCustom(column, request.form['customValue'])
+                preprocessingActions += "\n\tdataset['{0}']=fillCustom(dataset['{0}'],{1})".format(columnName, request.form['customValue'])
         elif nullHandler == "dropNullRows":
             dataset = dropNullRows(dataset, columnName)
+            preprocessingActions += "\n\tdataset=dropNullRows(dataset,'{0}')".format(columnName)
 
     return "Success"
 
 #Api to one hot encode
 @app.route('/oneHotEncodeColumns',methods=['POST'])
 def oneHotEncodeColumns():
-    global dataset
+    global dataset,preprocessingActions,params
+    preprocessingActions= appendAllNulls(preprocessingActions)
     columnNames = request.form['columnNames'].split(",")
     for col in columnNames:
-        df,enc= oneHotEncode(dataset[[col]])
+        df,enc= oneHotEncode(dataset[[col]],None)
+        params['one'+col]=enc
+        preprocessingActions += "\n\tdf=oneHotEncode(dataset[['{0}']],params['one'+'{0}'])".format(col)
         dataset = dataset.drop(columns=col)
+        preprocessingActions += "\n\tdataset = dataset.drop(columns='{0}')".format(col)
         dataset = pd.concat([dataset, df], axis=1)
+        preprocessingActions += "\n\tdataset = pd.concat([dataset, df], axis=1)"
     return "Success"
 
 #Api to get string
@@ -128,11 +156,15 @@ def getStringColumns():
 #Api to label encode
 @app.route('/labelEncodeColumns',methods=['GET'])
 def labelEncodeColumns():
-    global dataset
+    global dataset,preprocessingActions,params
+    preprocessingActions = appendAllNulls(preprocessingActions)
     columnNames = checkForStrings(dataset)
     for col in columnNames:
-        data,labelEncoder= labelEncode(dataset[[col]])
+        data,labelEncoder= labelEncode(dataset[[col]],None)
+        params['lab'+col]=labelEncoder
+        preprocessingActions += "\n\tdata = labelEncode(dataset[['{0}']],params['lab'+'{0}'])".format(col)
         dataset[col]=data
+        preprocessingActions += "\n\tdataset['{0}']=data".format(col)
     return "Success"
 
 
@@ -170,7 +202,6 @@ def callGraph():
     graphData=dataset.values.tolist()
     graphMetaData=list(dataset.columns)
     requestData= {'graphData':graphData, 'graphMetaData':graphMetaData}
-    print(graphMetaData)
     #requestData=json.dumps(requestData,ensure_ascii=True,allow_nan=True)
     r = requests.post(url=GRAPH_URL, json=requestData)
     return "Yes"
@@ -191,11 +222,21 @@ def splitData():
 #Function to split data
 @app.route('/standardizeData',methods=['POST'])
 def sendStandardizeData():  
-    global dataset
+    global dataset,params,preprocessingActions
     standardizeType=request.form['standardizeType']
     columnNames=request.form['columnNames'].split(",")
     individualColumn=request.form['individualColumn']
-    dataset= standardizeData(dataset, standardizeType, columnNames, individualColumn)
+    if (strToBool(individualColumn)):
+        for col in columnNames:
+            dataset[col],enc= standardizeData(dataset[[col]], standardizeType,None)
+            params['stan' + col] = enc
+            preprocessingActions += "\n\tdataset['{0}'] = standardizeData(dataset[['{0}']],'{1}',params['stan'+'{0}'])".format(col,standardizeType)
+    else:
+        columns=dataset.columns
+        dataset,enc=standardizeData(dataset,standardizeType,None)
+        dataset=pd.DataFrame(dataset,columns=columns)
+        params['stan'] = enc
+        preprocessingActions += "\n\tdataset = standardizeData(dataset,'{0}',params['stan'])".format(standardizeType)
     return "success"
         
 #Function to return list of algorithms based on type of algorithm
@@ -215,7 +256,6 @@ def getAlgorithms():
 def getHyperparameters(): 
     algorithm=request.form['algorithm']
     responseData= {"hyperparameters": HYPERPARAMETERS[algorithm]}
-    print(request)
     r = make_response(responseData)
     r.mimetype = 'text/plain'
     return r
@@ -242,17 +282,19 @@ def evaluate():
 @app.route('/predictFile',methods=['POST'])     
 def predictFile():
     global modFit,predictedData
+    global params,preprocessingActions
     headerFlag= strToBool(request.form["headerFlag"])
     responseData,fileName= uploadFile(ALLOWED_EXTENSIONS, app.config['UPLOAD_FOLDER'])
     if fileName!=None:
         testDataset= loadData(fileName, headerFlag)
-        predictedData= predict(modFit, testDataset)
+        params['dataset']=testDataset
+        predictedData= fetchPreProcessData(params, preprocessingActions)
+        #predictedData= predict(modFit, preprocessedData)
     return "success"
 
 @app.route('/downloadPrediction')
 def downloadPrediction():
     global predictedData
-    print(predictedData)
     pd.DataFrame(predictedData).to_csv(".\data\predictions.csv")
     return send_file(".\data\\predictions.csv", as_attachment=True)
 
@@ -261,6 +303,6 @@ def downloadPrediction():
 
 if __name__ == '__main__':
    app.run()
-   preprocessingActions = ""
+
 
 

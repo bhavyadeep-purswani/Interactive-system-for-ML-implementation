@@ -5,26 +5,24 @@ from modules.utilities import strToBool
 
 
 #function to standardize data
-def standardizeData(dataset, standardizeType, columnNames, individualColumn):
-    if(standardizeType=="standard"):
-        scaler = StandardScaler()
-        if(strToBool(individualColumn)):
-            for col in columnNames:
-                dataset[col]=scaler.fit_transform(dataset[[col]])
+def standardizeData(data, standardizeType,scaler=None):
+    if scaler==None:
+        if(standardizeType=="standard"):
+            scaler = StandardScaler()
+            data=scaler.fit_transform(data)
         else:
-            new = dataset[columnNames].copy()
-            scaler=scaler.fit(new)
-            dataset[columnNames]=scaler.transform(dataset[columnNames])
+            scaler = MinMaxScaler()
+            data = scaler.fit_transform(data)
+        return data,scaler
     else:
-        scaler = MinMaxScaler()
-        if(strToBool(individualColumn)):
-            for col in columnNames:
-                dataset[col]=scaler.fit_transform(dataset[[col]])
+        if (standardizeType == "standard"):
+            scaler = StandardScaler()
+            data = scaler.fit_transform(data)
         else:
-            new = dataset[columnNames].copy()
-            scaler=scaler.fit(new)
-            dataset[columnNames]=scaler.transform(dataset[columnNames])
-    return dataset
+            scaler = MinMaxScaler()
+            data = scaler.fit_transform(data)
+        return data
+
 
 #Function to check if data contains Null values
 def containsNull(data):
@@ -66,15 +64,30 @@ def fillBackward(data):
     return data
 
 #Function to Label Encode Column
-def labelEncode(data):
-    labelEncoder = preprocessing.LabelEncoder()
-    data = labelEncoder.fit_transform(data)
-    return data,labelEncoder
+def labelEncode(data, enc):
+
+    #data=[str(x) for x in data]
+    data = data.applymap(str)
+    if enc==None:
+        enc = preprocessing.LabelEncoder()
+        data = enc.fit_transform(data)
+        return data,enc
+    else:
+        data = enc.fit_transform(data)
+        return data
+
 
 #Function to One hot Encode Column
-def oneHotEncode(data):
-    enc = OneHotEncoder(handle_unknown='ignore')
-    enc.fit(data)
-    data=enc.transform(data).toarray()
-    df=pd.DataFrame(data,columns=enc.categories_)
-    return df,enc
+def oneHotEncode(data, enc):
+    data = data.applymap(str)
+    if enc==None:
+        enc = OneHotEncoder(handle_unknown='ignore')
+        enc.fit(data)
+        data=enc.transform(data).toarray()
+        df=pd.DataFrame(data,columns=enc.categories_)
+        return df, enc
+    else:
+        enc.fit(data)
+        data = enc.transform(data).toarray()
+        df = pd.DataFrame(data, columns=enc.categories_)
+        return df

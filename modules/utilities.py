@@ -1,4 +1,7 @@
 #Function to convert strToBool
+from importlib import reload
+
+
 def strToBool(s):
     if(s=="True" or s=="true" or s==True):
         return True
@@ -14,3 +17,18 @@ def checkForStrings(data):
         if val=="string" or val=="object":
             columns.append(col)
     return columns
+
+
+def fetchPreProcessData(params,preprocessingActions):
+    preprocessingActions+="\n\treturn dataset"
+    f=open('preProcessActions.py','w+')
+    f.write(preprocessingActions)
+    f.close()
+    import preProcessActions
+    preProcessActions=reload(preProcessActions)
+    return preProcessActions.preprocess(params)
+
+
+def appendAllNulls(preprocessingActions):
+    preprocessingActions += "\n\tfor x in dataset.columns:\n\t\tdataset[x]=fillMostCommon(dataset[x])"
+    return preprocessingActions
