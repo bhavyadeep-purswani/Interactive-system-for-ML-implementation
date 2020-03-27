@@ -5,7 +5,6 @@ Created on Sat Jan  4 19:33:27 2020
 @author: lekha
 """
 
-
 from flask import Flask,request,make_response,send_file
 import pandas as pd
 from flask_cors import CORS
@@ -14,13 +13,9 @@ import requests
 from sklearn.model_selection import train_test_split
 from modules.MLModelProcessing import createModel, createModelFit, evaluateModel, predict
 from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERS, CALGORITHMS, RALGORITHMS
-from modules.fileprocessing import uploadFile, loadData, fileHead
-from modules.preprocessing import standardizeData, containsNull, fillCustom, fillMean, fillMedian, fillMostCommon, \
-    dropNullRows, fillForward, fillBackward, labelEncode, oneHotEncode
+from modules.fileprocessing import loadData, fileHead, uploadFile
+from modules.preprocess import standardizeData, containsNull, fillCustom, fillMean, fillMedian, fillMostCommon, dropNullRows, fillForward, fillBackward, labelEncode, oneHotEncode
 from modules.utilities import strToBool, checkForStrings
-
-
-
 
 #global variables
 global trainFileName
@@ -51,7 +46,7 @@ def trainUpload():
     global trainFileName
     global dataset
     headerFlag= strToBool(request.form["headerFlag"])
-    responseData,fileName= uploadFile(ALLOWED_EXTENSIONS)
+    responseData,fileName= uploadFile(ALLOWED_EXTENSIONS, app.config['UPLOAD_FOLDER'])
     if fileName!=None:
         trainFileName=fileName
         dataset= loadData(trainFileName, headerFlag)
@@ -248,7 +243,7 @@ def evaluate():
 def predictFile():
     global modFit,predictedData
     headerFlag= strToBool(request.form["headerFlag"])
-    responseData,fileName= uploadFile(ALLOWED_EXTENSIONS)
+    responseData,fileName= uploadFile(ALLOWED_EXTENSIONS, app.config['UPLOAD_FOLDER'])
     if fileName!=None:
         testDataset= loadData(fileName, headerFlag)
         predictedData= predict(modFit, testDataset)
@@ -268,4 +263,4 @@ if __name__ == '__main__':
    app.run()
    preprocessingActions = ""
 
-    
+

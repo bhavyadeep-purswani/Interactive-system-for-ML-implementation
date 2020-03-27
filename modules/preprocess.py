@@ -1,12 +1,11 @@
 import pandas as pd
 from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
-
 from modules.utilities import strToBool
-from server import dataset
+
 
 #function to standardize data
-def standardizeData(data,standardizeType,columnNames,individualColumn):
+def standardizeData(dataset, standardizeType, columnNames, individualColumn):
     if(standardizeType=="standard"):
         scaler = StandardScaler()
         if(strToBool(individualColumn)):
@@ -25,7 +24,7 @@ def standardizeData(data,standardizeType,columnNames,individualColumn):
             new = dataset[columnNames].copy()
             scaler=scaler.fit(new)
             dataset[columnNames]=scaler.transform(dataset[columnNames])
-    return data
+    return dataset
 
 #Function to check if data contains Null values
 def containsNull(data):
