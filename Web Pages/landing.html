@@ -1,30 +1,45 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Interactive System for ML implementation</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title></title>
   <script src="js/importCommonFiles.js" type="text/javascript"></script>
+  <script src="js/jquery.min.js" type="text/javascript" ></script>
+  <link href="css/simple-sidebar.css" rel="stylesheet">
+
 </head>
-<body onload="init()" onunload="initializeStorage()">
-  <div class="heading-1 centered-text bold-text">
-    Interactive System for ML implementation
-  </div>
-  <div class="normal-text centered-text italics-text margin-top-normal">
-    "Providing you an easy medium to use the power of Machine Learning"
-  </div>
-  <button
-    type="button button-large"
-    class="btn btn-success btn-lg element-center margin-top-extra-large"
-    onclick="window.location.href = 'uploadData.html';">
-    Let's Start <i class="fas fa-chevron-right"></i>
-  </button>
+
+<body onload="init();">
+
+  
+    
+      <div class="container-fluid">
+        <div class="heading-1 centered-text bold-text">
+          Interactive System for ML implementation
+        </div>
+        <div class="normal-text centered-text italics-text margin-top-normal">
+          "Providing you an easy medium to use the power of Machine Learning"
+        </div>
+        <button
+          type="button button-large"
+          class="btn btn-success btn-lg element-center margin-top-extra-large"
+          onclick="window.location.href = 'uploadData.html';">
+          Let's Start <i class="fas fa-chevron-right"></i>
+        </button>
+     
+    
+
+  
   <script>
-    function init() {
-    }
-    function initializeStorage() {
-      addToSessionStorage("datasetUploaded", false);
-    }
+  
   </script>
+
 </body>
+
 </html>

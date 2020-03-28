@@ -1,48 +1,153 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
+
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Data Upload</title>
-  <script src="js/importCommonFiles.js" type="text/javascript"></script>
-  <style>
-  #uploadFileButton:hover {
-    background-color: #00b28f;
-  }
-  #uploadFileName {
-    margin-left: 10px;
-    font-family: sans-serif;
-    color: #aaa;
-  }
-  </style>
-</head>
-<body onload="init()">
-  <div class="heading-1 centered-text bold-text">
-    Upload Dataset
-  </div>
-  <div class="normal-text centered-text margin-top-extra-large">
-    <form method="post">
-      Select the database file:<br>
-      <input type="file" id="uploadedFile" hidden="hidden" />
-      <button type="button" class="btn btn-info margin-top-normal" id="uploadFileButton">CHOOSE A FILE</button>
-      <div id="uploadFileName" class="margin-top-normal">No file chosen, yet.</div>
-      <input type="checkbox" id="headerFlag" name="headerFlag" class="margin-top-normal" checked> File includes header<br>
-      <button type="button" class="btn btn-primary" onclick="uploadData()">Proceed</button><br>
-      <div id="errorMsg" class="error-text margin-top-normal"></div><br>
-    </form>
-  </div>
-  <div class="normal-text bold-text" id = "selectTargetLabel">Select target Attribute:</div>
-  <div id = "dataHead">
-    <div id = "tableDiv">
-    </div>
-    <div id="errorMsgTarget" class="error-text margin-top-normal"></div><br>
-  </div>
-  <script>
+  <meta name="description" content="">
+  <meta name="author" content="">
 
+  <title></title>
+  
+  <script src="js/importCommonFiles.js" type="text/javascript"></script>
+  <script src="js/jquery.min.js" type="text/javascript" ></script>
+  <link href="css/simple-sidebar.css" rel="stylesheet">
+ 
+
+</head>
+
+<body onload="init();">
+
+  
+    <div class="d-flex" id="wrapper">
+      <div class="bg-light border-right" id="sidebar-wrapper">
+        <div class="sidebar-heading">Menu </div>
+        <div class="list-group list-group-flush">
+          <a type="button" class="list-group-item list-group-item-action bg-light" data-toggle="modal"  id="viewDatasetButton" onclick="handleviewDatasetButton();">
+            View Current Dataset
+          </a>
+          <a type="button" class="list-group-item list-group-item-action bg-light" data-toggle="modal"  id="removeColumnButton" onclick="handleremoveColumnButton();">
+            Remove Columns
+          </a>
+        </div>
+      </div>
+    
+      <div id="page-content-wrapper">
+    
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+          <button class="btn btn-primary" id="menu-toggle"> Menu</button>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </nav>
+      <div class="container-fluid">
+        <div class="heading-1 centered-text bold-text">
+          Upload Dataset
+        </div>
+        <div class="normal-text centered-text margin-top-extra-large">
+          <form method="post">
+            Select the dataset file:<br>
+            <input type="file" id="uploadedFile" hidden="hidden" />
+            <button type="button" class="btn btn-info margin-top-normal" id="uploadFileButton">CHOOSE A FILE</button>
+            <div id="uploadFileName" class="margin-top-normal">No file chosen, yet.</div>
+            <input type="checkbox" id="headerFlag" name="headerFlag" class="margin-top-normal" checked> File includes header<br>
+            <button type="button" class="btn btn-primary" onclick="uploadData()">Proceed</button><br>
+            <div id="errorMsg" class="error-text margin-top-normal"></div><br>
+          </form>
+        </div>
+        <div class="normal-text bold-text" id = "selectTargetLabel">Select target Attribute:</div>
+        <div id = "dataHead">
+          <div id = "tableDiv">
+          </div>
+          <div id="errorMsgTarget" class="error-text margin-top-normal"></div><br>
+        </div>
+    </div>
+    </div>
+
+    <!----------------------------------------------MODAL DATASET-------------------------------------->
+    <div class="modal fade" id="viewDatasetModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="viewDatasetBody">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!----------------------------------------------MODAL DATASET------------------------------------>
+
+    <!----------------------------------------------MODAL REMOVE COLUMNS----------------------------------->
+    <div class="modal fade" id="removeColumnsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!----------------------------------------------MODAL REMOVE COLUMNS----------------------------------->
+  
+  <script>
+    var datasetUploaded=false;
   function init() {
+   
+
     initFileButton();
     hideSelectTargetLabel();
   }
+
+  function handleremoveColumnButton()
+  {
+    if(datasetUploaded==true)
+    {
+    $('#removeColumnsModal').modal('show')
+    
+  }
+
+  function handleviewDatasetButton()
+  {
+    if(datasetUploaded==true)
+    {
+    
+    var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:5000/trainHead";
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        var json = JSON.parse(xhr.responseText);
+        var data=json.data;
+        var metadata=json.metaData;
+        createFileHead(data,metadata,document.getElementById("viewDatasetBody"))
+        $('#viewDatasetModal').modal('show')
+      }
+    };
+    xhr.send();
+    }
+  }
+  }
+
 
   function hideSelectTargetLabel() {
     document.getElementById("selectTargetLabel").style.display = "None";
@@ -85,6 +190,7 @@
           var uploadText=xhr.responseText;
           if (uploadText=="File uploaded successfully")
           {
+            datasetUploaded=true;
             addToSessionStorage("datasetUploaded", true);
             loadDatasetHead();
           }
@@ -220,5 +326,7 @@
     }
   }
   </script>
+
 </body>
+
 </html>

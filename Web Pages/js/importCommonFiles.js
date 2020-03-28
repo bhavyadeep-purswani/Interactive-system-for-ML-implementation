@@ -13,15 +13,20 @@ function loadjscssfile(filename, filetype){
   if (typeof fileref!="undefined")
   document.getElementsByTagName("head")[0].appendChild(fileref);
 }
-loadjscssfile("js/jquery-3.4.1.min.js", "js");
+loadjscssfile("js/jquery.min.js", "js");
 loadjscssfile("css/bootstrap.min.css", "css");
 loadjscssfile("css/commonCssUtils.css", "css");
 loadjscssfile("css/fontawesome.css", "css");
 loadjscssfile("css/brands.css", "css");
 loadjscssfile("css/solid.css", "css");
 loadjscssfile("js/CommonJsUtils.js", "js");
+loadjscssfile("js/jquery.slim.js", "js");
+loadjscssfile("js/jquery.slim.min.js", "js");
+loadjscssfile("js/bootstrap.bundle.min.js", "js");
+loadjscssfile("js/bootstrap.min.js", "js");
 setTimeout(() => {
   loadjscssfile("js/popper.min.js", "js");
   loadjscssfile("js/bootstrap.min.js", "js");
   loadjscssfile("js/fontawesome.js", "js");
+
 }, 50);
