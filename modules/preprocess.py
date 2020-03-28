@@ -65,7 +65,7 @@ def fillBackward(data):
 
 #Function to Label Encode Column
 def labelEncode(data, enc):
-
+    # TODO: Provide context why the code is commented, if not to be used later remove
     #data=[str(x) for x in data]
     data = data.applymap(str)
     if enc==None:

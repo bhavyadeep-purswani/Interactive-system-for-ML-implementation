@@ -10,6 +10,7 @@ from modules.utilities import strToBool
 
 #function to create MachineLearning Model
 def createModel(algorithm,hyperparameters):
+    # TODO: You already have the alogrithm names stored in a list in Constants reference from that rather than using String literals
     if algorithm=="Linear Regression":
         fit_intercept= strToBool(hyperparameters["fit_intercept"])
         mod=LinearRegression(fit_intercept=fit_intercept)
