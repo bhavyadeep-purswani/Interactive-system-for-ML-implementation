@@ -112,7 +112,10 @@
           var response = JSON.parse(xhr.responseText);
           if (response.columnList.length != 0) {
             addToSessionStorage("columnsWithNullValus", xhr.responseText);
+            // TODO: redirect to drop column module
             window.location = "handleNull.html";
+          } else {
+            // TODO: Redirect to preprocessing page
           }
         } else {
           goToPreprocessing();
@@ -181,7 +184,8 @@
     input.setAttribute('type','button');
     input.setAttribute('onclick','targetAttribute();');
     input.setAttribute('class','btn btn-primary element-center margin-top-normal');
-    input.innerHTML= "Proceed"
+    input.innerHTML= "Proceed";
+
     dataHead.appendChild(input);
   }
 
