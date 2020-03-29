@@ -62,10 +62,10 @@ createTableNormal(data,metaData,div)
 
 function createTableRadio(data,metaData,div)
   {
-    
+    console.log(div)
     var tbl=document.createElement('table');
-    var tblDiv = document.getElementById("tableDiv");
-    tblDiv.innerHTML="";
+   
+   div.innerHTML="";
     tbl.style.width = '100%';
     tbl.setAttribute('border', '1');
     var tbdy = document.createElement('tbody');
@@ -96,20 +96,14 @@ function createTableRadio(data,metaData,div)
       tbdy.appendChild(tr);
     }
     tbl.appendChild(tbdy);
-    tblDiv.appendChild(tbl);
-    var input= document.createElement('input');
-          input.setAttribute('type','button');
-          input.setAttribute('onclick','targetAttribute();');
-          input.setAttribute('value','Select Target Attribute');
-          tblDiv.appendChild(input);
-   div.appendChild(tblDiv);
+  div.appendChild(tbl)
   }
   function createTableCheck(data,metaData,div)
   {
     
     var tbl=document.createElement('table');
-    var tblDiv = document.getElementById("tableDiv");
-    tblDiv.innerHTML="";
+    
+   div.innerHTML="";
     tbl.style.width = '100%';
     tbl.setAttribute('border', '1');
     var tbdy = document.createElement('tbody');
@@ -140,20 +134,15 @@ function createTableRadio(data,metaData,div)
       tbdy.appendChild(tr);
     }
     tbl.appendChild(tbdy);
-    tblDiv.appendChild(tbl);
-    var input= document.createElement('input');
-          input.setAttribute('type','button');
-          input.setAttribute('onclick','removeColumns();');
-          input.setAttribute('value','Remove Columns');
-          tblDiv.appendChild(input);
-   div.appendChild(tblDiv);
+   
+   div.appendChild(tbl);
   }
   function createTableNormal(data,metaData,div)
   {
     
     var tbl=document.createElement('table');
-    var tblDiv = document.getElementById("tableDiv");
-    tblDiv.innerHTML="";
+    
+   div.innerHTML="";
     tbl.style.width = '100%';
     tbl.setAttribute('border', '1');
     var tbdy = document.createElement('tbody');
@@ -180,9 +169,9 @@ function createTableRadio(data,metaData,div)
       tbdy.appendChild(tr);
     }
     tbl.appendChild(tbdy);
-    tblDiv.appendChild(tbl);
+
    
-   div.appendChild(tblDiv);
+   div.appendChild(tbl);
   }
 
   

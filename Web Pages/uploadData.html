@@ -24,12 +24,12 @@
       <div class="bg-light border-right" id="sidebar-wrapper">
         <div class="sidebar-heading">Menu </div>
         <div class="list-group list-group-flush">
-          <a type="button" class="list-group-item list-group-item-action bg-light" data-toggle="modal"  id="viewDatasetButton" onclick="handleviewDatasetButton();">
+          <button type="button" class="list-group-item list-group-item-action bg-light" data-toggle="modal"  id="viewDatasetButton" onclick="handleviewDataset();">
             View Current Dataset
-          </a>
-          <a type="button" class="list-group-item list-group-item-action bg-light" data-toggle="modal"  id="removeColumnButton" onclick="handleremoveColumnButton();">
+          </button>
+          <button type="button" class="list-group-item list-group-item-action bg-light" data-toggle="modal"  id="removeColumnButton" onclick="handleremoveColumnButton();">
             Remove Columns
-          </a>
+          </button>
         </div>
       </div>
     
@@ -118,6 +118,35 @@
     hideSelectTargetLabel();
   }
 
+
+  
+  function targetAttribute()
+  {
+    var ele = document.getElementsByName('targetColumn');
+    var targetColumn = null;
+    for(i = 0; i < ele.length; i++)
+    {
+      if(ele[i].checked)
+      targetColumn=ele[i].value;
+    }
+    if (targetColumn == null) {
+      document.getElementById("errorMsgTarget").innerHTML = "Please select a Target Attribute";
+    } else {
+      var xhr = new XMLHttpRequest();
+      var url = "http://127.0.0.1:5000/selectTargetAttribute";
+      xhr.open("POST", url, true);
+      var form_data = new FormData();
+      form_data.append('targetColumn',targetColumn);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200)
+        {
+          goToPreprocessing();
+        }
+      };
+      xhr.send(form_data);
+    }
+  }
+
   function handleremoveColumnButton()
   {
     if(datasetUploaded==true)
@@ -125,12 +154,12 @@
     $('#removeColumnsModal').modal('show')
     
   }
-
-  function handleviewDatasetButton()
+  }
+  function handleviewDataset()
   {
     if(datasetUploaded==true)
     {
-    
+      console.log(document.getElementById("viewDatasetBody"))
     var xhr = new XMLHttpRequest();
     var url = "http://127.0.0.1:5000/trainHead";
     xhr.open("GET", url, true);
@@ -139,14 +168,15 @@
         var json = JSON.parse(xhr.responseText);
         var data=json.data;
         var metadata=json.metaData;
-        createFileHead(data,metadata,document.getElementById("viewDatasetBody"))
+        
+        createTableRadio(data,metadata,document.getElementById("viewDatasetBody"));
         $('#viewDatasetModal').modal('show')
       }
     };
     xhr.send();
     }
   }
-  }
+  
 
 
   function hideSelectTargetLabel() {
@@ -227,95 +257,34 @@
     };
     xhr.send();
   }
-
+function appendTargetButton()
+{
+  var div=document.getElementById("tableDiv")
+  var input= document.createElement('button');
+    input.setAttribute('type','button');
+    input.setAttribute('onclick','targetAttribute();');
+    input.setAttribute('class','btn btn-primary margin-top-normal');
+    input.innerHTML= "Select Target Attribute"
+    div.appendChild(input);
+}
   function loadDatasetHead() {
+    var div=document.getElementById("tableDiv")
+   
     document.getElementById("selectTargetLabel").style.display = "block";
     var xhr = new XMLHttpRequest();
     var url = "http://127.0.0.1:5000/trainHead";
     xhr.open("GET", url, true);
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status === 200) {
+        console.log(div)
         var json = JSON.parse(xhr.responseText);
         var data=json.data;
         var metadata=json.metaData;
-        createTableRadio(data,metadata);
+        createFileHead(data,metadata,"radio",div)
+         appendTargetButton();
       }
     };
     xhr.send();
-  }
-
-  function createTableRadio(data,metaData)
-  {
-    var tbl=document.createElement('table');
-    var tblDiv = document.getElementById("tableDiv");
-    var dataHead = document.getElementById("dataHead");
-    tblDiv.innerHTML="";
-    tbl.style.width = '100%';
-    tbl.setAttribute('class', 'table table-bordered table-striped');
-    tblDiv.setAttribute('style', "overflow-x:auto;");
-    var thead = document.createElement('thead');
-    var tbdy = document.createElement('tbody');
-    var tr = document.createElement('tr');
-    for (var j = 0; j < metaData.length; j++)
-    {
-      var th = document.createElement('th');
-      th.appendChild(document.createTextNode(metaData[j]));
-      var input= document.createElement('input');
-      input.setAttribute('type','radio');
-      input.setAttribute('name','targetColumn');
-      input.setAttribute('value',metaData[j]);
-      input.setAttribute('style',"display:inline;");
-      th.appendChild(input);
-      tr.appendChild(th);
-    }
-    thead.appendChild(tr);
-    tbl.appendChild(thead);
-    for (var i = 0; i < data.length;i++)
-    {
-      var tr = document.createElement('tr');
-      for (var j = 0; j < metaData.length; j++)
-      {
-        var td = document.createElement('td');
-        td.appendChild(document.createTextNode(data[i][j]));
-        tr.appendChild(td)
-      }
-      tbdy.appendChild(tr);
-    }
-    tbl.appendChild(tbdy);
-    tblDiv.appendChild(tbl);
-    var input= document.createElement('button');
-    input.setAttribute('type','button');
-    input.setAttribute('onclick','targetAttribute();');
-    input.setAttribute('class','btn btn-primary element-center margin-top-normal');
-    input.innerHTML= "Proceed"
-    dataHead.appendChild(input);
-  }
-
-  function targetAttribute()
-  {
-    var ele = document.getElementsByName('targetColumn');
-    var targetColumn = null;
-    for(i = 0; i < ele.length; i++)
-    {
-      if(ele[i].checked)
-      targetColumn=ele[i].value;
-    }
-    if (targetColumn == null) {
-      document.getElementById("errorMsgTarget").innerHTML = "Please select a Target Attribute";
-    } else {
-      var xhr = new XMLHttpRequest();
-      var url = "http://127.0.0.1:5000/selectTargetAttribute";
-      xhr.open("POST", url, true);
-      var form_data = new FormData();
-      form_data.append('targetColumn',targetColumn);
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200)
-        {
-          goToPreprocessing();
-        }
-      };
-      xhr.send(form_data);
-    }
   }
 
   function checkUploadedFile() {
