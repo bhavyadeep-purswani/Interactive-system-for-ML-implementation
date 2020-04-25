@@ -1,2 +1,2 @@
-from PredictionLayer.Predictors.ProblemTypePredictor import getPredictedProblemType
-from PredictionLayer.Predictors.NullValuePredictor import checkForOutliers, getPredictedNullValueHandler
+from PredictionLayer.Predictors.ProblemTypePredictor import getPredictedProblemType, trainProblemTypePredictor
+from PredictionLayer.Predictors.NullValuePredictor import getPredictedNullValueHandler

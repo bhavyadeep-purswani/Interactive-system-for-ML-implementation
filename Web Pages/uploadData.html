@@ -17,6 +17,7 @@
   </style>
 </head>
 <body onload="init()">
+  <div id="cover-spin"></div>
   <div class="heading-1 centered-text bold-text">
     Upload Dataset
   </div>
@@ -70,75 +71,76 @@
 
   function uploadData() {
     if (checkUploadedFile()) {
-      var xhr = new XMLHttpRequest();
+      document.getElementById("errorMsg").innerHTML="";
+      showLoading(true);
+      var callback = function(response) {
+        var uploadText=response;
+        if (uploadText=="File uploaded successfully")
+        {
+          showLoading(false);
+          addToSessionStorage("datasetUploaded", true);
+          loadDatasetHead();
+        }
+        else
+        {
+          document.getElementById("errorMsg").innerHTML = uploadText;
+        }
+      };
       var url = "http://127.0.0.1:5000/trainUpload";
-      xhr.open("POST", url, true);
       var file=document.getElementById("uploadedFile").files[0];
       var headerFlag = document.getElementById("headerFlag");
       var form_data = new FormData();
       form_data.append('file',file);
       form_data.append('headerFlag',headerFlag.checked);
-      xhr.onreadystatechange = function ()
-      {
-        if (xhr.readyState === 4 && xhr.status === 200)
-        {
-          var uploadText=xhr.responseText;
-          if (uploadText=="File uploaded successfully")
-          {
-            addToSessionStorage("datasetUploaded", true);
-            loadDatasetHead();
-          }
-          else
-          {
-            document.getElementById("errorMsg").innerHTML = uploadText;
-          }
-        }
-      };
-      xhr.send(form_data);
+      makeRequest(url, form_data, "POST", callback);
     } else {
       document.getElementById("errorMsg").innerHTML="No file Selected!";
     }
   }
 
   function goToPreprocessing() {
-    var xhr = new XMLHttpRequest();
     var url = "http://127.0.0.1:5000/getColumnsWithNullValues";
-    xhr.open("GET", url, true);
-    xhr.onreadystatechange = function ()
-    {
-      if (xhr.readyState === 4)
-      {
-        if (xhr.status === 200) {
-          var response = JSON.parse(xhr.responseText);
-          if (response.columnList.length != 0) {
-            addToSessionStorage("columnsWithNullValus", xhr.responseText);
-            // TODO: redirect to drop column module
-            window.location = "handleNull.html";
-          } else {
-            // TODO: Redirect to preprocessing page
-          }
-        } else {
-          goToPreprocessing();
-        }
+    var callback = function(response) {
+      var responseJSON = JSON.parse(response);
+      if (getBool(getFromSessionStorage("targetContainsNull", false))) {
+        responseJSON.columnList.unshift(getFromSessionStorage("targetColumn"));
+      }
+      if (responseJSON.columnList.length != 0) {
+        addToSessionStorage("columnsWithNullValus", response);
+        window.location = "handleNull.html";
+      } else {
+        addToSessionStorage("nullHandlingComplete", true);
+        window.location = "selectProblemType.html";
       }
     };
-    xhr.send();
+    makeRequest(url, null, "GET", callback);
+  }
+
+  function checkTargetColumnContainsNull() {
+    var url = "http://127.0.0.1:5000/checkTargetColumnForNull";
+    var callback = function(response) {
+      if (getBool(response)) {
+        addToSessionStorage("targetContainsNull", true);
+      } else {
+        addToSessionStorage("targetContainsNull", false);
+      }
+      goToPreprocessing();
+    };
+    makeRequest(url, null, "GET", callback);
   }
 
   function loadDatasetHead() {
-    document.getElementById("selectTargetLabel").style.display = "block";
-    var xhr = new XMLHttpRequest();
+    showLoading(true);
     var url = "http://127.0.0.1:5000/trainHead";
-    xhr.open("GET", url, true);
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === 4 && xhr.status === 200) {
-        var json = JSON.parse(xhr.responseText);
-        var data=json.data;
-        var metadata=json.metaData;
-        createTableRadio(data,metadata);
-      }
+    var callback = function(response) {
+      var json = JSON.parse(response);
+      document.getElementById("selectTargetLabel").style.display = "block";
+      var data=json.data;
+      var metadata=json.metaData;
+      createTableRadio(data,metadata);
+      showLoading(false);
     };
-    xhr.send();
+    makeRequest(url, null, "GET", callback);
   }
 
   function createTableRadio(data,metaData)
@@ -156,7 +158,7 @@
     for (var j = 0; j < metaData.length; j++)
     {
       var th = document.createElement('th');
-      th.appendChild(document.createTextNode(metaData[j]));
+      th.appendChild(document.createTextNode(metaData[j] + " "));
       var input= document.createElement('input');
       input.setAttribute('type','radio');
       input.setAttribute('name','targetColumn');
@@ -180,13 +182,16 @@
     }
     tbl.appendChild(tbdy);
     tblDiv.appendChild(tbl);
+    if (document.getElementById('proceed') == null) {
     var input= document.createElement('button');
-    input.setAttribute('type','button');
-    input.setAttribute('onclick','targetAttribute();');
-    input.setAttribute('class','btn btn-primary element-center margin-top-normal');
-    input.innerHTML= "Proceed";
+      input.setAttribute('type','button');
+      input.setAttribute('onclick','targetAttribute();');
+      input.setAttribute('id', 'proceed');
+      input.setAttribute('class','btn btn-primary element-center margin-top-normal');
+      input.innerHTML= "Proceed";
 
-    dataHead.appendChild(input);
+      dataHead.appendChild(input);
+    }
   }
 
   function targetAttribute()
@@ -201,20 +206,17 @@
     if (targetColumn == null) {
       document.getElementById("errorMsgTarget").innerHTML = "Please select a Target Attribute";
     } else {
-      var xhr = new XMLHttpRequest();
+      document.getElementById("errorMsgTarget").innerHTML = "";
       var url = "http://127.0.0.1:5000/selectTargetAttribute";
-      xhr.open("POST", url, true);
+      var callback = function(response) {
+        checkTargetColumnContainsNull();
+      };
       var form_data = new FormData();
       form_data.append('targetColumn',targetColumn);
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200)
-        {
-          goToPreprocessing();
-        }
-      };
-      xhr.send(form_data);
-    }
+      addToSessionStorage("targetColumn", targetColumn);
+      makeRequest(url, form_data, "POST", callback);
   }
+}
 
   function checkUploadedFile() {
     if (document.getElementById("uploadedFile").files[0] == null) {

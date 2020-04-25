@@ -26,10 +26,56 @@ function addToSessionStorage(key, value) {
   }
 }
 
-function getFromSessionStorage(key) {
+function getFromSessionStorage(key, defaultValue) {
   if (typeof(Storage) !== undefined) {
-    return localStorage.getItem(key);
+    return localStorage.getItem(key) == null ? defaultValue : localStorage.getItem(key);
   } else {
-    return getCookie(key);
+    return getCookie(key) == null ? defaultValue : getCookie(key);
+  }
+}
+
+function getBool(boolean) {
+  if (boolean == "True" || boolean == true || boolean == "true") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function showLoading(show) {
+  if (show) {
+    document.getElementById("cover-spin").style.display = "block";
+  } else {
+    document.getElementById("cover-spin").style.display = "none";
+  }
+}
+
+function makeRequest(url, formData, method, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.open(method, url, true);
+  var retryAttempts = 0;
+  xhr.onreadystatechange = function ()
+  {
+    if (xhr.readyState === 4)
+    {
+      if (xhr.status === 200) {
+        callback(xhr.responseText);
+      } else {
+        if (retryAttempts < 5) {
+          xhr.open(method, url, true);
+          if (method == "GET" || method == "get" || formData == null) {
+            xhr.send();
+          } else {
+            xhr.send(formData);
+          }
+          retryAttempts += 1;
+        }
+      }
+    }
+  };
+  if (method == "GET" || method == "get" || formData == null) {
+    xhr.send();
+  } else {
+    xhr.send(formData);
   }
 }

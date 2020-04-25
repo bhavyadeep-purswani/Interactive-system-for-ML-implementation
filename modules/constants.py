@@ -9,3 +9,18 @@ GRAPH_URL = 'http://127.0.0.1:5001/loadGraphData'
 HYPERPARAMETERS=json.loads(open("resources/hyperparamters.json","r").read())
 CALGORITHMS=["Random Forrest Classifier","KNeighbors Classifier","Logistic Regression","SVM Classification","Gaussian Naive Bayes","Neural Network Classification"]
 RALGORITHMS=["Random Forrest Regressor","Linear Regression","SVM Regression","Gaussian Naive Bayes","Neural Network Regression"]
+
+
+class NullValuePredictions:
+    DROP_ROWS = "dropRows"
+    DROP_COLUMN = "dropColumn"
+    FILL_MEAN = "fillMean"
+    FILL_MEDIAN = "fillMedian"
+    FILL_CUSTOM = "fillCustom"
+    NO_PREDICTION = "noPrediction"
+
+
+class ProblemType:
+    CLASSIFICATION = "Classification"
+    REGRESSION = "Regression"
+
