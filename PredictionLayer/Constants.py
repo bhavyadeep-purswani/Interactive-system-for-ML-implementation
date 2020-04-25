@@ -20,7 +20,7 @@ class ProblemType:
 
 
 class ProblemTypePredictor:
-    NEIGHBOUR_HYPERPARAMETER = 1
+    NEIGHBOUR_HYPERPARAMETER = 3
     DEFAULT_MEAN_RATIO_FOR_SMALL_DATASET = 0.2
     DEFAULT_MEAN_RATIO_FOR_MEDIUM_DATASET = 0.1
     DEFAULT_MEAN_RATIO_FOR_LARGE_DATASET = 0.1
@@ -30,12 +30,12 @@ class ProblemTypePredictor:
 
 class NullValuePredictor:
     DROP_ROW_BENCHMARK_PERCENTAGE = 4
-    DROP_COLUMN_BENCHMARK_PERCENTAGE = 60
+    DROP_COLUMN_BENCHMARK_PERCENTAGE = 70
     FILL_CUSTOM_BENCHMARK_PERCENTAGE = 20
 
 
 class NullValuePredictions:
-    DROP_ROWS = "dropRows"
+    DROP_ROWS = "dropNullRows"
     DROP_COLUMN = "dropColumn"
     FILL_MEAN = "fillMean"
     FILL_MEDIAN = "fillMedian"

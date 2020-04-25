@@ -33,3 +33,13 @@ def predictProblemType(dataFile: pd.DataFrame, uniqueRatio: float) -> str:
     knn = KNeighborsClassifier(n_neighbors=Constants.ProblemTypePredictor.NEIGHBOUR_HYPERPARAMETER)
     knn.fit(pd.DataFrame(dataFile[Constants.DataFile.MEAN_COLUMN]), dataFile[Constants.DataFile.TYPE_COLUMN])
     return knn.predict([[uniqueRatio]])[0]
+
+
+def trainProblemTypePredictor(targetColumn: pd.Series, problemType: str) -> bool:
+    dataFile = Utils.getDataFile()
+    row_df = pd.DataFrame({
+        "Mean": round(Utils.getUniqueValueRatio(targetColumn), 5),
+        "Type": problemType
+    }, index=[0])
+    dataFile = dataFile.append(row_df, ignore_index=True).drop_duplicates()
+    return Utils.setDataFile(dataFile)

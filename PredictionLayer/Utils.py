@@ -26,7 +26,17 @@ def getDataFile() -> pd.DataFrame:
         return pd.DataFrame()
 
 
+def setDataFile(df: pd.DataFrame) -> bool:
+    try:
+        df.to_csv(__file__ + Constants.DataFile.NAME, index=False, header=True)
+        return True
+    except IOError as e:
+        print(Constants.LOG_TAG + "Exception occurred while writing data file: " + str(e))
+        return False
+
+
 def getNumberOfNullValues(column: pd.Series) -> int:
+    print(Constants.LOG_TAG + "Count of null values = " + str(pd.isnull(column).values.tolist().count(True)))
     return pd.isnull(column).values.tolist().count(True)
 
 
@@ -36,3 +46,11 @@ def getQ1(column: pd.Series) -> float:
 
 def getQ3(column: pd.Series) -> float:
     return column.describe()["75%"]
+
+
+def checkForOutliers(column: pd.Series) -> bool:
+    column = pd.Series.dropna(column, axis=0)
+    q1 = getQ1(column)
+    q3 = getQ3(column)
+    iqr = q3 - q1
+    return any(((column < (q1 - 1.5 * iqr)) | (column > (q3 + 1.5 * iqr))).values.tolist())

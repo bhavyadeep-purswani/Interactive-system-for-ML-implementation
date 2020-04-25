@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Standardize Columns</title>
+    <script src="js/importCommonFiles.js" type="text/javascript"></script>
+    <style>
+
+    </style>
+  </head>
+  <body onload="init()">
+    <div id="cover-spin"></div>
+    <div class="heading-1 centered-text bold-text">
+      Standardize Columns
+    </div>
+    <div class="margin-top-extra-large"><span class = "normal-text bold-text">Select Columns that you wish to Standardize:</div>
+    <div id = "tableDiv" class="margin-top-normal">
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-10 offset-sm-2">
+          <div class="margin-top-normal form-inline">
+            <label class="normal-text bold-text margin-right-small" for="standardizeType">Approach: </label>
+            <select class="form-control mb-2 mr-sm-2" id = "standardizeType">
+              <option value="standard">Standard Scalar</option>
+              <option value="minMax">Min Max Scalar</option>
+            </select>
+            <label class="normal-text bold-text margin-right-small margin-left-normal" for="applyIndividual">How do you want to apply this approach? </label>
+            <select class="form-control mb-2 mr-sm-2" id = "applyIndividual">
+              <option value="true">Individually on selected columns</option>
+              <option value="false">Apply on complete dataset</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="margin-top-normal">
+    <button type="button" class="btn btn-primary element-center" id="submit">Submit</button>
+    </div>
+    <script type="text/javascript">
+      function init() {
+        checkOneHotEncodingDone();
+        getContinousValuedColumns();
+        setOnChangeListener();
+        setOnClickListener();
+       }
+
+      function checkOneHotEncodingDone() {
+        if (getFromSessionStorage("oneHotEncodeDataCompleted", null) == null) {
+          window.location = "oneHotEncodeData.html";
+        }
+      }
+
+      function getContinousValuedColumns() {
+        var url = "http://127.0.0.1:5000/getContinuousValuedColumns";
+        var callBack = function(response) {
+          var columnDict = JSON.parse(response);
+          if (columnDict.columnList.length != 0) {
+            getFilteredDatasetHead(columnDict.columnList);
+          } else {
+            addToSessionStorage("standardizationDone", "true");
+            window.location = "selectProblemType.html";
+          }
+        }
+        makeRequest(url, null, "GET", callBack);
+      }
+
+      function getFilteredDatasetHead(columnList) {
+        var url = "http://127.0.0.1:5000/trainHeadFiltered";
+        var form_data = new FormData();
+        form_data.append("columnNames", columnList.join(","));
+        var callBack = function(response) {
+          var json = JSON.parse(response);
+          var data=json.data;
+          var metadata=json.metaData;
+          createTableCheckbox(data,metadata);
+        }
+        makeRequest(url, form_data, "POST", callBack);
+      }
+
+      function createTableCheckbox(data,metaData)
+      {
+        var tbl=document.createElement('table');
+        var tblDiv = document.getElementById("tableDiv");
+        tblDiv.innerHTML="";
+        tbl.style.width = '100%';
+        tbl.setAttribute('class', 'table table-bordered table-striped');
+        tblDiv.setAttribute('style', "overflow-x:auto;");
+        var thead = document.createElement('thead');
+        var tbdy = document.createElement('tbody');
+        var tr = document.createElement('tr');
+        for (var j = 0; j < metaData.length; j++)
+        {
+          var th = document.createElement('th');
+          th.appendChild(document.createTextNode(metaData[j] + " "));
+          var input= document.createElement('input');
+          input.setAttribute('type','checkbox');
+          input.setAttribute('name','columns[]');
+          input.setAttribute('value',metaData[j]);
+          input.setAttribute('style',"display:inline;");
+          th.appendChild(input);
+          tr.appendChild(th);
+        }
+        thead.appendChild(tr);
+        tbl.appendChild(thead);
+        for (var i = 0; i < data.length;i++)
+        {
+          var tr = document.createElement('tr');
+          for (var j = 0; j < metaData.length; j++)
+          {
+            var td = document.createElement('td');
+            td.appendChild(document.createTextNode(data[i][j]));
+            tr.appendChild(td)
+          }
+          tbdy.appendChild(tr);
+        }
+        tbl.appendChild(tbdy);
+        tblDiv.appendChild(tbl);
+      }
+
+      function setOnChangeListener() {
+        document.getElementById("applyIndividual").addEventListener("change", () => {
+          if (document.getElementById("applyIndividual").value == "false") {
+            removeCheckBox();
+          } else {
+            showCheckBox();
+          }
+        });
+      }
+
+      function removeCheckBox() {
+        $("[type='checkbox']").css("display", "none");
+      }
+
+      function showCheckBox() {
+        $("[type='checkbox']").css("display", "inline");
+      }
+
+      function setOnClickListener() {
+        document.getElementById("submit").addEventListener("click", () => {
+          var checkedValue = [];
+          var inputElements = document.getElementsByName('columns[]');
+          for(var i=0; inputElements[i]; i++){
+                if(inputElements[i].checked){
+                     checkedValue.push(inputElements[i].value);
+                }
+          }
+          var applyIndividual = document.getElementById("applyIndividual").value;
+          var method = document.getElementById("standardizeType").value;
+          var url = "http://127.0.0.1:5000/standardizeData";
+          var form_data = new FormData();
+          form_data.append("standardizeType", method);
+          form_data.append("individualColumn", applyIndividual);
+          var callback = function(response) {
+            addToSessionStorage("standardizationDone", "true");
+            window.location = "selectProblemType.html";
+          };
+          if (applyIndividual == "true" && checkedValue.length == 0) {
+            addToSessionStorage("standardizationDone", "true");
+            window.location = "selectProblemType.html";
+          } else {
+            form_data.append("columnNames", applyIndividual == "true" ? checkedValue.join(",") : "");
+            makeRequest(url, form_data, "POST", callback);
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
