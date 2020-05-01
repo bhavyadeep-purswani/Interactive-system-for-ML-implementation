@@ -41,7 +41,7 @@ def createModel(algorithm,hyperparameters):
             max_depth = int(float(hyperparameters["max_depth"]))
         min_samples_leaf=float(hyperparameters["min_samples_leaf"])
         max_features=hyperparameters["max_features"]
-        if(max_features not in HYPERPARAMETERS[Algorithms.Random_Forrest_Regressor]["max_features"]["options"] ):
+        if max_features not in HYPERPARAMETERS[Algorithms.Random_Forrest_Regressor]["max_features"]["options"]:
             max_features=int(float(max_features))
         if hyperparameters["max_leaf_nodes"] == "None" or hyperparameters["max_leaf_nodes"] == "none":
             max_leaf_nodes = None

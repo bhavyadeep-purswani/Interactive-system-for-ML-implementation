@@ -88,12 +88,6 @@ def createModel(algorithm, hyperparameters):
         algorithmK = hyperparameters["algorithm"]
         leaf_size = hyperparameters["leaf_size"]
         mod = KNeighborsClassifier(n_neighbors=n_neighbors, weights=weights, algorithm=algorithmK, leaf_size=leaf_size)
-    if algorithm == "Logistic Regression":
-        penalty = hyperparameters["penalty"]
-        dual = Utils.strToBool(hyperparameters["dual"])
-        c = hyperparameters["c"]
-        max_iter = hyperparameters["max_iter"]
-        mod = LogisticRegression(penalty=penalty, dual=dual, C=c, max_iter=max_iter)
     if algorithm == "SVM Classification":
         C = hyperparameters["C"]
         kernel = hyperparameters["kernel"]

@@ -25,8 +25,7 @@ class Algorithms:
         return CALGORITHMS
     @staticmethod
     def getRegressionAlgorithms():
-        RALGORITHMS = ["Random Forrest Regressor", "Linear Regression", "SVM Regression", "Gaussian Naive Bayes",
-                       "Neural Network Regression"]
+        RALGORITHMS = ["Random Forrest Regressor", "Linear Regression", "SVM Regression", "Neural Network Regression"]
         return RALGORITHMS
 
 

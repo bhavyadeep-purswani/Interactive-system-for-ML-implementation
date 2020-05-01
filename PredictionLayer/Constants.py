@@ -44,7 +44,7 @@ class NullValuePredictions:
 
 
 class AlgorithmPredictor:
-    CALGORITHMS = ["Random Forrest Classifier", "KNeighbors Classifier", "Logistic Regression", "SVM Classification",
+    CALGORITHMS = ["Random Forrest Classifier", "KNeighbors Classifier", "SVM Classification",
                    "Gaussian Naive Bayes", "Neural Network Classification"]
     RALGORITHMS = ["Random Forrest Regressor", "Linear Regression", "SVM Regression", "Neural Network Regression"]
     HYPERPARAMTERES_FILE = "PredictionLayer/data/hyperparamters.json"

@@ -14,11 +14,8 @@ from sklearn.model_selection import train_test_split
 
 from PredictionLayer import getPredictedNullValueHandler, getPredictedProblemType, trainProblemTypePredictor, \
     predictAlgorithm
-from modules.MLModelProcessing import createModel, createModelFit, evaluateModel
-from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERS, CALGORITHMS, RALGORITHMS, \
-    ProblemType
-from modules.MLModelProcessing import createModel, createModelFit, evaluateModel,predict
-from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERSFILE,  \
+from modules.MLModelProcessing import createModel, createModelFit, evaluateModel, predict
+from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERSFILE, \
     ProblemType, Algorithms
 from modules.fileprocessing import loadData, fileHead, uploadFile, fileHeadFiltered
 from modules.preprocess import standardizeData, containsNull, fillCustom, fillMean, fillMedian, fillMostCommon, \
@@ -35,7 +32,6 @@ global X_train, X_test, y_train, y_test
 global mod
 global modFit
 global predictedData
-global preprocessingActions
 global params
 
 # params={}
