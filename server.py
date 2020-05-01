@@ -17,6 +17,9 @@ from PredictionLayer import getPredictedNullValueHandler, getPredictedProblemTyp
 from modules.MLModelProcessing import createModel, createModelFit, evaluateModel
 from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERS, CALGORITHMS, RALGORITHMS, \
     ProblemType
+from modules.MLModelProcessing import createModel, createModelFit, evaluateModel,predict
+from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERSFILE,  \
+    ProblemType, Algorithms
 from modules.fileprocessing import loadData, fileHead, uploadFile, fileHeadFiltered
 from modules.preprocess import standardizeData, containsNull, fillCustom, fillMean, fillMedian, fillMostCommon, \
     dropNullRows, fillForward, fillBackward, labelEncode, oneHotEncode, getNumberOfNullValues
@@ -348,9 +351,9 @@ def sendStandardizeData():
 def getAlgorithms():
     typeAlgorithm = request.form['typeAlgorithm']
     if typeAlgorithm == ProblemType.CLASSIFICATION:
-        responseData = {"algorithms": CALGORITHMS}
+        responseData = {"algorithms": Algorithms.getClassificationAlgorithms()}
     else:
-        responseData = {"algorithms": RALGORITHMS}
+        responseData = {"algorithms": Algorithms.getRegressionAlgorithms()}
     r = make_response(responseData)
     r.mimetype = 'text/plain'
     return r
@@ -367,6 +370,7 @@ def getPredictedAlgorithm():
 @app.route('/getHyperparameters', methods=['POST'])
 def getHyperparameters():
     algorithm = request.form['algorithm']
+    HYPERPARAMETERS=json.loads(open(HYPERPARAMETERSFILE, "r").read())
     responseData = {"hyperparameters": HYPERPARAMETERS[algorithm]}
     r = make_response(responseData)
     r.mimetype = 'text/plain'
@@ -403,8 +407,8 @@ def predictFile():
     if fileName != None:
         testDataset = loadData(fileName, headerFlag)
         params['dataset'] = testDataset
-        predictedData = fetchPreProcessData(params, preprocessingActions)
-        # predictedData= predict(modFit, preprocessedData)
+        preprocessedData = fetchPreProcessData(params, preprocessingActions)
+        predictedData= predict(modFit, preprocessedData)
     return "success"
 
 

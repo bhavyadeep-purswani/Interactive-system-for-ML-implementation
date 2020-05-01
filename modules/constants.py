@@ -5,10 +5,30 @@ import json
 UPLOAD_FOLDER='data' #Ubuntu
 ALLOWED_EXTENSIONS = {'csv'}
 GRAPH_URL = 'http://127.0.0.1:5001/loadGraphData'
-# TODO: Do not load files in constants file, rather just store the file name and using this file name load the file wherever required
-HYPERPARAMETERS=json.loads(open("resources/hyperparamters.json","r").read())
-CALGORITHMS=["Random Forrest Classifier","KNeighbors Classifier","Logistic Regression","SVM Classification","Gaussian Naive Bayes","Neural Network Classification"]
-RALGORITHMS=["Random Forrest Regressor","Linear Regression","SVM Regression","Gaussian Naive Bayes","Neural Network Regression"]
+HYPERPARAMETERSFILE="resources/hyperparamters.json"
+
+
+class Algorithms:
+    Random_Forrest_Classifier="Random Forrest Classifier"
+    KNeighbors_Classifier="KNeighbors Classifier"
+    SVM_Classification="SVM Classification"
+    Gaussian_Naive_Bayes="Gaussian Naive Bayes"
+    Neural_Network_Classification="Neural Network Classification"
+    Neural_Network_Regression = "Neural Network Regression"
+    Random_Forrest_Regressor = "Random Forrest Regressor"
+    SVM_Regression = "SVM Regression"
+    Linear_Regression = "Linear Regression"
+    @staticmethod
+    def getClassificationAlgorithms():
+        CALGORITHMS = ["Random Forrest Classifier", "KNeighbors Classifier", "SVM Classification",
+                       "Gaussian Naive Bayes", "Neural Network Classification"]
+        return CALGORITHMS
+    @staticmethod
+    def getRegressionAlgorithms():
+        RALGORITHMS = ["Random Forrest Regressor", "Linear Regression", "SVM Regression", "Gaussian Naive Bayes",
+                       "Neural Network Regression"]
+        return RALGORITHMS
+
 
 
 class NullValuePredictions:
