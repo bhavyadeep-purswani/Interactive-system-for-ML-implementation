@@ -79,3 +79,11 @@ function makeRequest(url, formData, method, callback) {
     xhr.send(formData);
   }
 }
+
+function getStrFromBool(bool) {
+  if (bool) {
+    return "True";
+  } else {
+    return "False";
+  }
+}

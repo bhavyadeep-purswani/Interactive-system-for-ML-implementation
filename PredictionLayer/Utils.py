@@ -54,3 +54,10 @@ def checkForOutliers(column: pd.Series) -> bool:
     q3 = getQ3(column)
     iqr = q3 - q1
     return any(((column < (q1 - 1.5 * iqr)) | (column > (q3 + 1.5 * iqr))).values.tolist())
+
+
+def strToBool(s):
+    if(s=="True" or s=="true" or s==True):
+        return True
+    else:
+        return False

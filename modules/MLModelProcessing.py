@@ -44,7 +44,7 @@ def createModel(algorithm,hyperparameters):
         dual= strToBool(hyperparameters["dual"])
         c=float(hyperparameters["c"])
         max_iter=int(float(hyperparameters["max_iter"]))
-        mod=LogisticRegression(penalty=penalty,dual=dual,c=c,max_iter=max_iter)
+        mod=LogisticRegression(penalty=penalty,dual=dual,C=c,max_iter=max_iter)
     if algorithm=="SVM Classification":
         C=int(float(hyperparameters["C"]))
         kernel=hyperparameters["kernel"]

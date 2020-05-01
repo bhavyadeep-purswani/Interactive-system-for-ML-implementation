@@ -41,3 +41,10 @@ class NullValuePredictions:
     FILL_MEDIAN = "fillMedian"
     FILL_CUSTOM = "fillCustom"
     NO_PREDICTION = "noPrediction"
+
+
+class AlgorithmPredictor:
+    CALGORITHMS = ["Random Forrest Classifier", "KNeighbors Classifier", "Logistic Regression", "SVM Classification",
+                   "Gaussian Naive Bayes", "Neural Network Classification"]
+    RALGORITHMS = ["Random Forrest Regressor", "Linear Regression", "SVM Regression", "Neural Network Regression"]
+    HYPERPARAMTERES_FILE = "PredictionLayer/data/hyperparamters.json"
