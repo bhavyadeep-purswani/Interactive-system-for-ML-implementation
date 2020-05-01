@@ -5,64 +5,77 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.svm import SVC, SVR
+import json
 
+from modules.constants import HYPERPARAMETERSFILE, Algorithms
 from modules.utilities import strToBool
 
 #function to create MachineLearning Model
 def createModel(algorithm,hyperparameters):
-    # TODO: You already have the alogrithm names stored in a list in Constants reference from that rather than using String literals
-    if algorithm=="Linear Regression":
+    HYPERPARAMETERS = json.loads(open(HYPERPARAMETERSFILE, "r").read())
+    print(type(HYPERPARAMETERS))
+    if algorithm==Algorithms.Linear_Regression:
         fit_intercept= strToBool(hyperparameters["fit_intercept"])
         mod=LinearRegression(fit_intercept=fit_intercept)
-    if algorithm=="Random Forrest Classifier":
+    if algorithm==Algorithms.Random_Forrest_Classifier:
         n_estimators=int(float(hyperparameters["n_estimators"]))
-        max_depth=int(float(hyperparameters["max_depth"]))
+        if hyperparameters["max_depth"] == "None" or hyperparameters["max_depth"] =="none":
+            max_depth=None
+        else:
+            max_depth=int(float(hyperparameters["max_depth"]))
         min_samples_split=float(hyperparameters["min_samples_split"])
         min_samples_leaf=float(hyperparameters["min_samples_leaf"])
         max_features=hyperparameters["max_features"]
-        if(max_features not in ["auto" ,"log2" ,"sqrt"] ):
+        if(max_features not in HYPERPARAMETERS[Algorithms.Random_Forrest_Classifier]["max_features"]["options"]  ):
             max_features=int(float(max_features))
-        max_leaf_nodes=int(float(hyperparameters["max_leaf_nodes"]))
+        if hyperparameters["max_leaf_nodes"] == "None" or hyperparameters["max_leaf_nodes"] =="none":
+            max_leaf_nodes = None
+        else:
+            max_leaf_nodes = int(float(hyperparameters["max_leaf_nodes"]))
         mod=RandomForestClassifier(n_estimators=n_estimators,max_depth=max_depth,min_samples_split=min_samples_split,min_samples_leaf=min_samples_leaf,max_features=max_features,max_leaf_nodes=max_leaf_nodes)
-    if algorithm=="Random Forrest Regressor":
+    if algorithm==Algorithms.Random_Forrest_Regressor:
         n_estimators=int(float(hyperparameters["n_estimators"]))
-        max_depth=int(float(hyperparameters["max_depth"]))
+        if hyperparameters["max_depth"] == "None" or hyperparameters["max_depth"] == "none":
+            max_depth = None
+        else:
+            max_depth = int(float(hyperparameters["max_depth"]))
         min_samples_leaf=float(hyperparameters["min_samples_leaf"])
         max_features=hyperparameters["max_features"]
-        if(max_features not in ["auto" ,"log2" ,"sqrt"] ):
+        if(max_features not in HYPERPARAMETERS[Algorithms.Random_Forrest_Regressor]["max_features"]["options"] ):
             max_features=int(float(max_features))
-        max_leaf_nodes=int(float(hyperparameters["max_leaf_nodes"]))
+        if hyperparameters["max_leaf_nodes"] == "None" or hyperparameters["max_leaf_nodes"] == "none":
+            max_leaf_nodes = None
+        else:
+            max_leaf_nodes = int(float(hyperparameters["max_leaf_nodes"]))
         mod=RandomForestRegressor(n_estimators=n_estimators,max_depth=max_depth,min_samples_leaf=min_samples_leaf,max_features=max_features,max_leaf_nodes=max_leaf_nodes)
-    if algorithm=="KNeighbors Classifier":
+    if algorithm==Algorithms.KNeighbors_Classifier:
         n_neighbors=int(float(hyperparameters["n_neighbors"]))
         weights=hyperparameters["weights"]
         algorithmK=hyperparameters["algorithm"]
         leaf_size=int(float(hyperparameters["leaf_size"]))
         mod=KNeighborsClassifier(n_neighbors=n_neighbors,weights=weights,algorithm=algorithmK,leaf_size=leaf_size)
-    if algorithm=="Logistic Regression":
-        penalty=hyperparameters["penalty"]
-        dual= strToBool(hyperparameters["dual"])
-        c=float(hyperparameters["c"])
-        max_iter=int(float(hyperparameters["max_iter"]))
-        mod=LogisticRegression(penalty=penalty,dual=dual,c=c,max_iter=max_iter)
-    if algorithm=="SVM Classification":
+    if algorithm==Algorithms.SVM_Classification:
         C=int(float(hyperparameters["C"]))
         kernel=hyperparameters["kernel"]
         degree=int(float(hyperparameters["degree"]))
         gamma=hyperparameters["gamma"]
+        if gamma not in HYPERPARAMETERS[Algorithms.SVM_Classification]["gamma"]["options"]:
+            gamma=int(float(hyperparameters["gamma"]))
         max_iter=int(float(hyperparameters["max_iter"]))
         mod=SVC(C=C,degree=degree,kernel=kernel,gamma=gamma,max_iter=max_iter)
-    if algorithm=="SVM Regression":
+    if algorithm==Algorithms.SVM_Regression:
         C=int(float(hyperparameters["C"]))
         kernel=hyperparameters["kernel"]
         degree=int(float(hyperparameters["degree"]))
         gamma=hyperparameters["gamma"]
+        if gamma not in HYPERPARAMETERS[Algorithms.SVM_Regression]["gamma"]["options"]:
+            gamma=int(float(hyperparameters["gamma"]))
         max_iter=int(float(hyperparameters["max_iter"]))
         mod=SVR(C=C,degree=degree,kernel=kernel,gamma=gamma,max_iter=max_iter)
-    if algorithm=="Gaussian Naive Bayes":
+    if algorithm==Algorithms.Gaussian_Naive_Bayes:
         var_smoothing=float(hyperparameters["var_smoothing"])
         mod=GaussianNB(var_smoothing=var_smoothing)
-    if algorithm=="Neural Network Classification":
+    if algorithm==Algorithms.Neural_Network_Classification:
         hidden_layer_sizes=int(float(hyperparameters["hidden_layer_sizes"]))
         hidden_layer_sizes=tuple((hidden_layer_sizes,))
         activation=hyperparameters["activation"]
@@ -70,7 +83,7 @@ def createModel(algorithm,hyperparameters):
         learning_rate=hyperparameters["learning_rate"]
         max_iter=int(float(hyperparameters["max_iter"]))
         mod=MLPClassifier(hidden_layer_sizes=hidden_layer_sizes,activation=activation,alpha=alpha,learning_rate=learning_rate,max_iter=max_iter)
-    if algorithm=="Neural Network Regression":
+    if algorithm==Algorithms.Neural_Network_Regression:
         hidden_layer_sizes=int(float(hyperparameters["hidden_layer_sizes"]))
         hidden_layer_sizes=tuple((hidden_layer_sizes,))
         activation=hyperparameters["activation"]
