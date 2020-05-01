@@ -26,7 +26,7 @@ def predictAlgorithm(X_train: pd.DataFrame, X_test: pd.DataFrame, Y_train: pd.Da
         algorithmList = Constants.AlgorithmPredictor.RALGORITHMS
     for algorithm in algorithmList:
         thread = threading.Thread(target=getAccuracy,
-                                  args=(algorithm, hyperparameterList, X_train, X_test, Y_train, Y_test, accuracies))
+                                  args=(algorithm, hyperparameterList, X_train, X_test, Y_train, Y_test, accuracies, problemType))
         thread.start()
         threads.append(thread)
     for thread in threads:
@@ -48,11 +48,11 @@ def predictAlgorithm(X_train: pd.DataFrame, X_test: pd.DataFrame, Y_train: pd.Da
     return algorithmMaxAccuracy
 
 
-def getAccuracy(algorithm, hyperparameterList, X_train, X_test, Y_train, Y_test, accuracies):
+def getAccuracy(algorithm, hyperparameterList, X_train, X_test, Y_train, Y_test, accuracies, problemType):
     hyperparams = getHyperParamsForAlgorithm(algorithm, hyperparameterList)
     mod = createModel(algorithm, hyperparams)
     modFit = createModelFit(mod, X_train, Y_train)
-    accuracy = evaluateModel(modFit, X_test, Y_test, algorithm)
+    accuracy = evaluateModel(modFit, X_test, Y_test, problemType)
     accuracies[algorithm] = accuracy
 
 
@@ -130,9 +130,9 @@ def createModelFit(mod, X, y):
     return modFit
 
 
-def evaluateModel(modFit,X,y, algorithm):
+def evaluateModel(modFit,X,y, problemType):
     y_pred=modFit.predict(X)
-    if algorithm == Constants.ProblemType.CLASSIFICATION:
+    if problemType == Constants.ProblemType.CLASSIFICATION:
         accuracy=accuracy_score(y, y_pred)*100
     else:
         accuracy = mean_squared_error(y, y_pred)
