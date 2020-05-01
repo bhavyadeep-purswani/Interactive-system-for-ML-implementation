@@ -3,5 +3,5 @@ import server
 import pandas as pd
 def preprocess(params):
 	dataset=params['dataset']
-	dataset.drop(['Name', 'Pclass', 'PassengerId', 'Ticket'],axis=1,inplace=True)
+	dataset = standardizeData(dataset,'standard',params['stan'])
 	return dataset

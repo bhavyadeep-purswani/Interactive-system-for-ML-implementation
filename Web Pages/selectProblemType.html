@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Select Problem Type</title>
+    <script src="js/importCommonFiles.js" type="text/javascript"></script>
+    <style>
+
+    </style>
+  </head>
+  <body onload="init()">
+    <div id="cover-spin"></div>
+    <div class="heading-1 centered-text bold-text">
+      Problem Type
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-5 offset-sm-4">
+          <form class="element-center margin-top-extra-large">
+            <div class="form-group">
+              <label for="problemType" class="normal-text bold-text">Select the Problem Type:</label>
+              <select class="form-control" id="problemType">
+                <option value = "Classification">Classification</option>
+                <option value = "Regression">Regression</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="splitRatio" class="normal-text bold-text">Split Ratio: (For test/train split)</label>
+              <input type="text" class="form-control" id="splitRatio" required>
+              (0.0 to 1.0)
+              <div class = "error-text" id = "errorMsg"></div>
+            </div>
+            <div class="form-group">
+              <label for="randomSeed" class="normal-text bold-text">Random Seed for Random Number Generator: (Optional)</label>
+              <input type="text" class="form-control" id="randomSeed">
+              <div class = "error-text" id = "errorMsgRandomSeed"></div>
+            </div>
+            <div class = "form-group">
+              <input type="checkbox" id="shuffle">
+              <label for="shuffle" class="normal-text bold-text"> Shuffle</label>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary element-center" id="submit" type="button">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      function init() {
+        checkStandardizationDone();
+        getPredictedProblemType();
+        setOnChangeListener();
+        setOnClickListener();
+      }
+
+      function setOnChangeListener() {
+        enableProceedCTA(false);
+        document.getElementById("splitRatio").addEventListener("input", validateSplitRatio);
+        document.getElementById("randomSeed").addEventListener("input", validateRandomSeed);
+      }
+
+      function validateSplitRatio() {
+        var num = parseFloat(document.getElementById("splitRatio").value);
+        if (isNaN(num)) {
+          document.getElementById("errorMsg").innerHTML= "Please enter a valid split ratio!";
+          enableProceedCTA(false);
+        } else if (num <= 0.0 || num >= 1.0) {
+          document.getElementById("errorMsg").innerHTML= "Please enter a split ratio within the range 0.0 to 1.0, 0.0 and 1.0 exclusive.";
+          enableProceedCTA(false);
+        } else {
+          document.getElementById("errorMsg").innerHTML= "";
+          enableProceedCTA(true);
+        }
+      }
+
+      function validateRandomSeed() {
+        var num = parseInt(document.getElementById("randomSeed").value);
+        if (document.getElementById("randomSeed").value == "") {
+          document.getElementById("errorMsgRandomSeed").innerHTML= "";
+          enableProceedCTA(true);
+        } else if (isNaN(num)) {
+          document.getElementById("errorMsgRandomSeed").innerHTML= "Please enter a valid integer!";
+          enableProceedCTA(false);
+        } else {
+          document.getElementById("errorMsgRandomSeed").innerHTML= "";
+          enableProceedCTA(true);
+        }
+      }
+
+      function setOnClickListener() {
+        document.getElementById("submit").addEventListener("click", onSubmit);
+      }
+
+      function enableProceedCTA(enable) {
+        if (enable) {
+          $("#submit").prop("disabled", false);
+        } else {
+          $("#submit").prop("disabled", true);
+        }
+      }
+
+      function checkStandardizationDone() {
+        if (!getBool(getFromSessionStorage("standardizationDone", false))) {
+          window.location = "standardizeData.html"
+        }
+      }
+
+      function getPredictedProblemType() {
+        showLoading(true);
+        var url = "http://127.0.0.1:5000/predictProblemType";
+        var callback = function(response) {
+          updatePredictedProblemType(response);
+          showLoading(false);
+        };
+        makeRequest(url, null, "GET", callback);
+      }
+
+      function updatePredictedProblemType(problemType) {
+        $("option[value='"+ problemType +"']").prop("selected", true);
+        $("option[value='"+ problemType +"']").html($("option[value='"+ problemType +"']").html() + " (Recommended)");
+      }
+
+      function onSubmit() {
+        showLoading(true);
+        trainProblemPredictor();
+        splitData();
+        addProblemTypeToStorage();
+      }
+
+      function trainProblemPredictor() {
+        var url = "http://127.0.0.1:5000/trainProblemType";
+        var form_data = new FormData();
+        form_data.append("problemType", document.getElementById("problemType").value);
+        makeRequest(url, form_data, "POST", onResult);
+      }
+
+      function splitData() {
+        var url = "http://127.0.0.1:5000/splitData";
+        var form_data = new FormData();
+        form_data.append("shuffle", getStrFromBool(document.getElementById("shuffle").checked));
+        form_data.append("testSize", document.getElementById("splitRatio").value);
+        if (document.getElementById("randomSeed").value != "") {
+          form_data.append("randomSeed", document.getElementById("randomSeed").value);
+        } else {
+          form_data.append("randomSeed", "None");
+        }
+        makeRequest(url, form_data, "POST", onResult);
+      }
+
+      function getStrFromBool(bool) {
+        if (bool) {
+          return "True";
+        } else {
+          return "False";
+        }
+      }
+
+      function addProblemTypeToStorage() {
+        addToSessionStorage("selectedProblemType", document.getElementById("problemType").value);
+      }
+
+      var apiCount = 2;
+      function onResult() {
+        apiCount--;
+        if (apiCount == 0) {
+          showLoading(false);
+          window.location = "selectAlgorithm.html";
+        }
+      }
+    </script>
+  </body>
+</html>
