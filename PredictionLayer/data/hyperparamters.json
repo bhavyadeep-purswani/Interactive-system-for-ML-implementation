@@ -137,41 +137,6 @@
       "default": "True"
     }
   } ,
-  "Logistic Regression": {
-    "penalty": {
-      "paramType": [
-        "str"
-      ] ,
-      "options": [
-        "l1" ,
-        "l2" ,
-        "elasticnet" ,
-        "none"
-      ] ,
-      "default": "l2"
-    } ,
-    "dual": {
-      "paramType": [
-        "bool"
-      ] ,
-      "options": [] ,
-      "default": "false"
-    } ,
-    "c": {
-      "paramType": [
-        "float"
-      ] ,
-      "options": [] ,
-      "default": 1.0
-    } ,
-    "max_iter": {
-      "paramType": [
-        "int"
-      ] ,
-      "options": [] ,
-      "default": 100
-    }
-  } ,
   "SVM Regression": {
     "C": {
       "paramType": [
