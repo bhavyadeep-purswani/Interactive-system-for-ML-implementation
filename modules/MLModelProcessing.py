@@ -1,14 +1,16 @@
+import json
+
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.svm import SVC, SVR
-import json
 
-from modules.constants import HYPERPARAMETERSFILE, Algorithms
+from modules.constants import HYPERPARAMETERSFILE, Algorithms, ProblemType
 from modules.utilities import strToBool
+
 
 #function to create MachineLearning Model
 def createModel(algorithm,hyperparameters):
@@ -99,14 +101,14 @@ def createModelFit(mod,X,y):
     return modFit
 
 #Function to evaluate model
-def evaluateModel(modFit,X,y):
+def evaluateModel(modFit,X,y, problemType):
     y_pred=modFit.predict(X)
-    accuracy=accuracy_score(y, y_pred)*100
-    tup=list(precision_recall_fscore_support(y, y_pred,average="micro"))
-    result={
-            "accuracy":accuracy,
-            "precision_recall_fscore_support":tup}
-    return result
+    if problemType == ProblemType.CLASSIFICATION:
+        accuracy = accuracy_score(y, y_pred)*100
+    else:
+        accuracy = mean_squared_error(y, y_pred)
+    return accuracy
+
 
 #Function to predict the prediction File
 def predict(modFit,testData):

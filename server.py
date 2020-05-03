@@ -388,7 +388,7 @@ def trainModel():
 def evaluate():
     global mod, modFit
     global X_test, y_test
-    responseData = evaluateModel(modFit, X_test, y_test)
+    responseData = evaluateModel(modFit, X_test, y_test, request.form['problemType'])
     r = make_response(responseData)
     r.mimetype = 'text/plain'
     return r
