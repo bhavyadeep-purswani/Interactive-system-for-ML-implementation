@@ -8,7 +8,7 @@ import json
 
 import pandas as pd
 import requests
-from flask import Flask, request, make_response, send_file
+from flask import Flask, request, make_response, send_file, render_template
 from flask_cors import CORS
 from sklearn.model_selection import train_test_split
 
@@ -299,7 +299,8 @@ def callGraph():
     requestData = {'graphData': graphData, 'graphMetaData': graphMetaData}
     # requestData=json.dumps(requestData,ensure_ascii=True,allow_nan=True)
     r = requests.post(url=GRAPH_URL, json=requestData)
-    return "Yes"
+
+    return render_template("Web Pages\graph.html")
 
 
 # Function to split data
