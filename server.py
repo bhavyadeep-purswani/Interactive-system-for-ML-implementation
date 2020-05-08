@@ -64,7 +64,7 @@ def trainHeadFiltered():
 @app.route('/trainUpload', methods=['POST'])
 def trainUpload():
     global trainFileName
-    global dataset, params, preprocessingActions
+    global dataset, params, preprocessingActions,graphDataset
     headerFlag = strToBool(request.form["headerFlag"])
     responseData, fileName = uploadFile(ALLOWED_EXTENSIONS, app.config['UPLOAD_FOLDER'])
     if fileName != None:
