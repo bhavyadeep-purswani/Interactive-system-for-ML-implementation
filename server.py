@@ -24,7 +24,7 @@ from modules.utilities import strToBool, checkForStrings, fetchPreProcessData, a
 
 # global variables
 global trainFileName
-global dataset
+global dataset,graphDataset
 global datasetDisplay
 global targetData
 global preprocessingActions
@@ -70,6 +70,7 @@ def trainUpload():
     if fileName != None:
         trainFileName = fileName
         dataset = loadData(trainFileName, headerFlag)
+        graphDataset=dataset
         params = {}
         preprocessingActions = "from modules.preprocess import *\nimport server\nimport pandas as pd\ndef preprocess(params):\n\tdataset=params['dataset']"
         r = make_response(responseData)
@@ -293,9 +294,9 @@ def data():
 # Function to call graph module
 @app.route('/callGraph')
 def callGraph():
-    global dataset
-    graphData = dataset.values.tolist()
-    graphMetaData = list(dataset.columns)
+    global graphDataset
+    graphData = graphDataset.values.tolist()
+    graphMetaData = list(graphDataset.columns)
     requestData = {'graphData': graphData, 'graphMetaData': graphMetaData}
     # requestData=json.dumps(requestData,ensure_ascii=True,allow_nan=True)
     r = requests.post(url=GRAPH_URL, json=requestData)
