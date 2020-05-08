@@ -11,7 +11,9 @@ import requests
 from flask import Flask, request, make_response, send_file, render_template
 from flask_cors import CORS
 from sklearn.model_selection import train_test_split
-
+import threading
+import time,os
+import webbrowser
 from PredictionLayer import getPredictedNullValueHandler, getPredictedProblemType, trainProblemTypePredictor, \
     predictAlgorithm
 from modules.MLModelProcessing import createModel, createModelFit, evaluateModel, predict
@@ -22,9 +24,11 @@ from modules.preprocess import standardizeData, containsNull, fillCustom, fillMe
     dropNullRows, fillForward, fillBackward, labelEncode, oneHotEncode, getNumberOfNullValues
 from modules.utilities import strToBool, checkForStrings, fetchPreProcessData, appendAllNulls
 
+
+
 # global variables
 global trainFileName
-global dataset,graphDataset
+global dataset
 global datasetDisplay
 global targetData
 global preprocessingActions
@@ -64,13 +68,13 @@ def trainHeadFiltered():
 @app.route('/trainUpload', methods=['POST'])
 def trainUpload():
     global trainFileName
-    global dataset, params, preprocessingActions,graphDataset
+    global dataset, params, preprocessingActions
     headerFlag = strToBool(request.form["headerFlag"])
     responseData, fileName = uploadFile(ALLOWED_EXTENSIONS, app.config['UPLOAD_FOLDER'])
     if fileName != None:
         trainFileName = fileName
         dataset = loadData(trainFileName, headerFlag)
-        graphDataset=dataset
+
         params = {}
         preprocessingActions = "from modules.preprocess import *\nimport server\nimport pandas as pd\ndef preprocess(params):\n\tdataset=params['dataset']"
         r = make_response(responseData)
@@ -294,15 +298,27 @@ def data():
 # Function to call graph module
 @app.route('/callGraph')
 def callGraph():
-    global graphDataset
+    global dataset,targetData
+
+    graphDataset=pd.concat([dataset,targetData],axis=1)
     graphData = graphDataset.values.tolist()
     graphMetaData = list(graphDataset.columns)
     requestData = {'graphData': graphData, 'graphMetaData': graphMetaData}
     # requestData=json.dumps(requestData,ensure_ascii=True,allow_nan=True)
+
     r = requests.post(url=GRAPH_URL, json=requestData)
 
     return "SUCCESS"
+def newFunc():
+    os.system("python graph.py")
 
+@app.route('/graphModule')
+def graphModule():
+    t1 = threading.Thread(target=newFunc)
+    t1.start()
+    time.sleep(10)
+    webbrowser.open_new_tab("Web Pages\graph.html")
+    return "SUCCESS"
 
 # Function to split data
 @app.route('/splitData', methods=['POST'])

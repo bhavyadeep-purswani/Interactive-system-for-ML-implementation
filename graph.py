@@ -14,7 +14,8 @@ from bokeh.plotting import figure
 from flask import Flask, request, make_response
 from flask_cors import CORS
 from bokeh.models.annotations import Title
-from bokeh.layouts import row,column,gridplot
+from bokeh.layouts import gridplot
+from sklearn import preprocessing
 import base64
 from io import BytesIO
 import seaborn as sn
@@ -93,6 +94,16 @@ def plotGraph():
     y_attr=request.form['y_attr']
     x_attr=request.form['x_attr']
     x_attr=x_attr.split(',')
+    mapping=""
+    if(str(data[y_attr].dtype)=="object"):
+        le = preprocessing.LabelEncoder()
+        data[y_attr]=le.fit_transform(data[y_attr])
+        le_name_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
+        mapping+="\tMAPPING"
+        for x in le_name_mapping:
+            mapping+=" "+x+":"+str(le_name_mapping[x])
+
+
 
     if graph=="bar":
         p = figure(plot_width=1000, plot_height=1000)
@@ -104,17 +115,19 @@ def plotGraph():
         p.xaxis.axis_label =xlabel
         p.yaxis.axis_label = y_attr
         t = Title()
-        t.text = "graph:" + graph + " x:" + x
+        t.text = "graph:" + graph + " x:" + x + mapping
         p.title = t
         show(p)
+        return "SUCCESS"
     if graph=="scatter":
         p = figure(plot_width=600, plot_height=600)
         for x in x_attr:
             p.scatter(data[x], data[y_attr], marker="x",line_color=hexColour(), fill_color=hexColour(), fill_alpha=0.5, size=12,legend=x)
         t = Title()
-        t.text = "graph:" + graph + " x:" + str(x_attr)
+        t.text = "graph:" + graph + " x:" + str(x_attr)+mapping
         p.title = t
         show(p)
+        return "SUCCESS"
     if graph=="line":
         l=[]
         for x in x_attr:
@@ -124,11 +137,12 @@ def plotGraph():
             p.yaxis.axis_label = y_attr
             #title = graph + " " + xlabel + " " + y_attr
             t=Title()
-            t.text ="graph:"+graph+" x:"+x
+            t.text ="graph:"+graph+" x:"+x+ mapping
             p.title = t
             l.append(p)
         print(organizePlots(l))
         show(gridplot(organizePlots(l)))
+        return "SUCCESS"
     if graph=="correlation":
 
         plt.figure()
