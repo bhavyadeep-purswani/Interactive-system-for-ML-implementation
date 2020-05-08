@@ -5,7 +5,7 @@ Created on Sat Jan  4 19:33:27 2020
 """
 
 import json
-
+import numpy as np
 import pandas as pd
 import requests
 from flask import Flask, request, make_response, send_file, render_template
@@ -300,7 +300,7 @@ def callGraph():
     # requestData=json.dumps(requestData,ensure_ascii=True,allow_nan=True)
     r = requests.post(url=GRAPH_URL, json=requestData)
 
-    return render_template("Web Pages\graph.html")
+    return "SUCCESS"
 
 
 # Function to split data
@@ -316,8 +316,10 @@ def splitData():
         randomSeed = int(request.form['randomSeed'])
     else:
         randomSeed = None
-    X_train, X_test, y_train, y_test = train_test_split(dataset, targetData, train_size=testSize,
-                                                        random_state=randomSeed, shuffle=shuffle)
+    if(testSize==0.0):
+        X_train, X_test, y_train, y_test=dataset,pd.DataFrame({'A' : [np.nan]}),targetData,pd.DataFrame({'A' : [np.nan]})
+    else:
+        X_train, X_test, y_train, y_test = train_test_split(dataset, targetData, train_size=testSize, random_state=randomSeed, shuffle=shuffle)
     return "Success"
 
 
