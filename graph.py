@@ -137,7 +137,7 @@ def plotGraph():
         fig=ax.get_figure()
         tmpfile = BytesIO()
         plt.savefig(tmpfile, format='png')
-        #fig.savefig("output.png")
+
         encoded = base64.b64encode(tmpfile.getvalue()).decode('utf-8')
         html = '<html><body> '+ '<img src=\'data:image/png;base64,{}\'>'.format(encoded) + '</body></html>'
         with open('correlation map.html', 'w') as f:
