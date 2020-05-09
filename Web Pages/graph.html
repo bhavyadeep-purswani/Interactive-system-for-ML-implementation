@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Graph Module</title>
+    <script src="js/importCommonFiles.js" type="text/javascript"></script>
+    <style>
+
+    </style>
+  </head>
+  <body onload="init()">
+    <div id="cover-spin"></div>
+    <div class="heading-1 centered-text bold-text">
+      Plot a Graph
+    </div>
+    <div id="tableDiv"></div><br>
+    <form>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-10 offset-sm-2">
+          <div class="margin-top-normal form-inline">
+            <label class="normal-text bold-text margin-right-small" >Graph Type: </label>
+            <select class="form-control mb-2 mr-sm-2" name="selectPlot" id="selectPlot" required onchange="disableXY();">
+              <option value="bar">Bar Graph</option>
+              <option value="scatter">Scatter Graph</option>
+              <option value="line">Line Graph</option>
+                <option value="correlation">Correlation Graph/Heat Map</option>
+            </select>
+            <label class="normal-text bold-text margin-right-small margin-left-normal" >Select Y attribute </label>
+            <select class="form-control mb-2 mr-sm-2" id="selectY" required>
+            </select>
+               <label class="normal-text bold-text margin-right-small margin-left-normal" >Select X attributes (Press Ctrl to select multiple attributes): </label>
+            <select class="form-control mb-2 mr-sm-2" id="selectX" multiple name="selectX[]" required>
+            </select>
+            <div class="margin-top-normal">
+    <button type="button" class="btn btn-primary btn-lg element-center" id="submit" onclick="plotGraph();">Plot</button>
+    </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </form>
+    <script type="text/javascript">
+
+function disableXY()
+{
+var selected = document.getElementById("selectPlot").value;
+if(selected=="correlation")
+{
+document.getElementById("selectX").disabled=true;
+document.getElementById("selectY").disabled=true;
+}
+else
+{
+document.getElementById("selectX").disabled=false;
+document.getElementById("selectY").disabled=false;
+}
+
+
+}
+
+    function createTable(data,metaData)
+  {
+    var tbl=document.createElement('table');
+        var tblDiv = document.getElementById("tableDiv");
+        tblDiv.innerHTML="";
+        tbl.style.width = '100%';
+        tbl.setAttribute('class', 'table table-bordered table-striped');
+        tblDiv.setAttribute('style', "overflow-x:auto;");
+    var tbdy = document.createElement('tbody');
+    var tr = document.createElement('tr');
+
+    for (var j = 0; j < metaData.length; j++)
+    {
+      var td = document.createElement('td');
+
+      td.appendChild(document.createTextNode(metaData[j]));
+      tr.appendChild(td);
+    }
+
+    tbdy.appendChild(tr);
+    tbl.appendChild(tbdy);
+    for (var i = 0; i < 5;i++)
+    {
+      var tr = document.createElement('tr');
+      for (var j = 0; j < metaData.length; j++)
+      {
+        var td = document.createElement('td');
+        td.appendChild(document.createTextNode(data[i][j]));
+        tr.appendChild(td)
+      }
+      tbdy.appendChild(tr);
+    }
+    tbl.appendChild(tbdy);
+    tblDiv.appendChild(tbl);
+
+  }
+  function selectRowColumn(x_attr,y_attr)
+  {
+
+    var selectY = document.getElementById('selectY');
+    for (var i = 0; i<y_attr.length; i++)
+    {
+      var opt = document.createElement('option');
+      opt.appendChild(document.createTextNode(y_attr[i]));
+      opt.value = y_attr[i];
+      selectY.appendChild(opt);
+    }
+
+
+
+    var selectX = document.getElementById('selectX');
+    for (var i = 0; i<x_attr.length; i++)
+    {
+      var opt = document.createElement('option');
+      opt.appendChild(document.createTextNode(x_attr[i]));
+      opt.value = x_attr[i];
+      selectX.appendChild(opt);
+    }
+
+
+  }
+  function loadTrainHead()
+  {
+    var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:5001/trainHead";
+    xhr.open("GET", url, true);
+    //xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        var json = JSON.parse(xhr.responseText);
+        //alert(xhr.responseText);
+
+        var data=json.data;
+        var metadata=json.metaData;
+
+        createTable(data,metadata);
+        getAttributes();
+      }
+    };
+    xhr.send();
+
+  }
+  function loadGraphData()
+  {
+      var xhr = new XMLHttpRequest();
+    var url = "http://127.0.0.1:5000/callGraph";
+    xhr.open("GET", url, true);
+       xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200)
+       {
+        var json = xhr.responseText;
+       loadTrainHead();
+
+      }
+    };
+    xhr.send();
+  }
+  //function to send graph and recieve attributes
+function getAttributes()
+{
+
+          var xhr = new XMLHttpRequest();
+          var url = "http://127.0.0.1:5001/getAttributes";
+          xhr.open("GET", url, true);
+          //xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.onreadystatechange = function ()
+          {
+            if (xhr.readyState === 4 && xhr.status === 200)
+            {
+              var json = JSON.parse(xhr.responseText);
+              //console.log(xhr2.responseText)
+              var x_attr=json.X;
+              var y_attr=json.Y;
+              selectRowColumn(x_attr,y_attr);
+            }
+          };
+          xhr.send();
+        }
+     function plotGraph()
+{
+var y_attr=document.getElementById("selectY").value;
+var graph=document.getElementById("selectPlot").value;
+var x_attr=[];
+var selectedValues = [];
+    $("#selectX :selected").each(function(){
+        x_attr.push($(this).val());
+    });
+  if(graph=="correlation")
+  {
+  y_attr="None";
+  x_attr="None";
+  }
+var form_data = new FormData();
+form_data.append('graph',graph);
+form_data.append('x_attr',x_attr);
+form_data.append('y_attr',y_attr);
+var xhr = new XMLHttpRequest();
+var url = "http://127.0.0.1:5001/plotGraph";
+xhr.open("POST", url, true);
+//xhr.setRequestHeader("Content-Type", "application/json");
+xhr.onreadystatechange = function ()
+  {
+    if (xhr.readyState === 4 && xhr.status === 200)
+      {
+
+
+      }
+  };
+xhr.send(form_data);
+
+}
+      function init() {
+
+     loadGraphData();
+
+      }
+    </script>
+  </body>
+</html>

@@ -23,7 +23,7 @@ Base paper algorithms
 .Knearest Classifier
 .Gaussian Naive Bayes-Both
 .Neural Network-Both
-.Logistic regression-Classifier
+
 .Linear regression-Regression
 
 
