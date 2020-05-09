@@ -35,10 +35,6 @@
               <input type="text" class="form-control" id="randomSeed">
               <div class = "error-text" id = "errorMsgRandomSeed"></div>
             </div>
-            <div class = "form-group">
-              <input type="checkbox" id="shuffle">
-              <label for="shuffle" class="normal-text bold-text"> Shuffle</label>
-            </div>
             <div class="form-group">
               <button class="btn btn-primary element-center" id="submit" type="button">Submit</button>
             </div>
@@ -138,7 +134,7 @@
       function splitData() {
         var url = "http://127.0.0.1:5000/splitData";
         var form_data = new FormData();
-        form_data.append("shuffle", getStrFromBool(document.getElementById("shuffle").checked));
+        form_data.append("shuffle", "True");
         form_data.append("testSize", document.getElementById("splitRatio").value);
         if (document.getElementById("randomSeed").value != "") {
           form_data.append("randomSeed", document.getElementById("randomSeed").value);
@@ -146,14 +142,6 @@
           form_data.append("randomSeed", "None");
         }
         makeRequest(url, form_data, "POST", onResult);
-      }
-
-      function getStrFromBool(bool) {
-        if (bool) {
-          return "True";
-        } else {
-          return "False";
-        }
       }
 
       function addProblemTypeToStorage() {

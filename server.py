@@ -4,20 +4,23 @@ Created on Sat Jan  4 19:33:27 2020
 @author: lekha
 """
 
-from flask import Flask, request, make_response, send_file
-import pandas as pd
-from flask_cors import CORS
 import json
+
+import pandas as pd
 import requests
+from flask import Flask, request, make_response, send_file
+from flask_cors import CORS
 from sklearn.model_selection import train_test_split
-from modules.MLModelProcessing import createModel, createModelFit, evaluateModel,predict
-from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERSFILE,  \
+
+from PredictionLayer import getPredictedNullValueHandler, getPredictedProblemType, trainProblemTypePredictor, \
+    predictAlgorithm
+from modules.MLModelProcessing import createModel, createModelFit, evaluateModel, predict
+from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERSFILE, \
     ProblemType, Algorithms
 from modules.fileprocessing import loadData, fileHead, uploadFile, fileHeadFiltered
 from modules.preprocess import standardizeData, containsNull, fillCustom, fillMean, fillMedian, fillMostCommon, \
     dropNullRows, fillForward, fillBackward, labelEncode, oneHotEncode, getNumberOfNullValues
 from modules.utilities import strToBool, checkForStrings, fetchPreProcessData, appendAllNulls
-from PredictionLayer import getPredictedNullValueHandler, getPredictedProblemType, trainProblemTypePredictor
 
 # global variables
 global trainFileName
@@ -29,7 +32,6 @@ global X_train, X_test, y_train, y_test
 global mod
 global modFit
 global predictedData
-global preprocessingActions
 global params
 
 # params={}
@@ -327,7 +329,6 @@ def sendStandardizeData():
     individualColumn = request.form['individualColumn']
     if strToBool(individualColumn):
         for col in columnNames:
-            columnNames
             dataset[col], enc = standardizeData(dataset[[col]], standardizeType, None)
             params['stan' + col] = enc
             preprocessingActions += "\n\tdataset['{0}'] = standardizeData(dataset[['{0}']],'{1}',params['stan'+'{0}'])".format(
@@ -352,6 +353,13 @@ def getAlgorithms():
     r = make_response(responseData)
     r.mimetype = 'text/plain'
     return r
+
+
+# Function to return predicted algorithm
+@app.route('/getPredictedAlgorithm', methods=['POST'])
+def getPredictedAlgorithm():
+    global X_train, X_test, y_train, y_test
+    return predictAlgorithm(X_train, X_test, y_train, y_test, request.form["problemType"])
 
 
 # Function to return list of hyperparameters based on algorithm
@@ -380,7 +388,7 @@ def trainModel():
 def evaluate():
     global mod, modFit
     global X_test, y_test
-    responseData = evaluateModel(modFit, X_test, y_test)
+    responseData = evaluateModel(modFit, X_test, y_test, request.form['problemType'])
     r = make_response(responseData)
     r.mimetype = 'text/plain'
     return r

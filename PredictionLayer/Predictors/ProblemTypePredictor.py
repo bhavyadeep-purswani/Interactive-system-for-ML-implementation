@@ -41,5 +41,6 @@ def trainProblemTypePredictor(targetColumn: pd.Series, problemType: str) -> bool
         "Mean": round(Utils.getUniqueValueRatio(targetColumn), 5),
         "Type": problemType
     }, index=[0])
-    dataFile = dataFile.append(row_df, ignore_index=True).drop_duplicates()
+    dataFile = dataFile.append(row_df, ignore_index=True)
+    dataFile = dataFile.round(decimals=5).drop_duplicates()
     return Utils.setDataFile(dataFile)
