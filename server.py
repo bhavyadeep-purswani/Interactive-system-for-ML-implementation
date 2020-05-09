@@ -309,8 +309,11 @@ def callGraph():
     r = requests.post(url=GRAPH_URL, json=requestData)
 
     return "SUCCESS"
+
+
 def newFunc():
     os.system("python graph.py")
+
 
 @app.route('/graphModule')
 def graphModule():
@@ -404,14 +407,14 @@ def trainModel():
     return "success"
 
 
-@app.route('/evaluateModel')
+@app.route('/evaluateModel', methods=['POST'])
 def evaluate():
     global mod, modFit
     global X_test, y_test
     responseData = evaluateModel(modFit, X_test, y_test, request.form['problemType'])
-    r = make_response(responseData)
-    r.mimetype = 'text/plain'
-    return r
+    #r = make_response(responseData)
+    #r.mimetype = 'text/plain'
+    return str(responseData)
 
 
 @app.route('/predictFile', methods=['POST'])
@@ -420,7 +423,7 @@ def predictFile():
     global params, preprocessingActions
     headerFlag = strToBool(request.form["headerFlag"])
     responseData, fileName = uploadFile(ALLOWED_EXTENSIONS, app.config['UPLOAD_FOLDER'])
-    if fileName != None:
+    if fileName is not None:
         testDataset = loadData(fileName, headerFlag)
         params['dataset'] = testDataset
         preprocessedData = fetchPreProcessData(params, preprocessingActions)

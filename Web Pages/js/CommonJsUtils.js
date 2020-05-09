@@ -87,3 +87,11 @@ function getStrFromBool(bool) {
     return "False";
   }
 }
+
+function showObject(object) {
+  object.style.display = "block";
+}
+
+function hideObject(object) {
+  object.style.display = "none";
+}

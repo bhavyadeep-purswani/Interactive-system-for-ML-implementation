@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Upload Prediction File</title>
+    <script src="js/importCommonFiles.js" type="text/javascript"></script>
+    <style>
+
+    </style>
+  </head>
+  <body onload="init()">
+    <div id="cover-spin"></div>
+    <div class="heading-1 centered-text bold-text">
+      Upload Prediction File
+    </div>
+    <div class="normal-text centered-text margin-top-extra-large">
+      <form method="post">
+        Select the file to be predicted:<br>
+        <input type="file" id="uploadedFile" hidden="hidden" />
+        <button type="button" class="btn btn-info margin-top-normal" id="uploadFileButton">CHOOSE A FILE</button>
+        <div id="uploadFileName" class="margin-top-normal">No file chosen, yet.</div>
+        <input type="checkbox" id="headerFlag" name="headerFlag" class="margin-top-normal" checked> File includes header<br>
+        <button type="button" class="btn btn-primary" onclick="uploadData()">Proceed</button><br>
+        <div id="errorMsg" class="error-text margin-top-normal"></div><br>
+      </form>
+    </div>
+    <script type="text/javascript">
+      function init() {
+        checkAccuracyDisplayed();
+        initFileButton();
+      }
+
+      function checkAccuracyDisplayed() {
+        if (!getStrFromBool(getFromSessionStorage("accuracyDisplayed", false))) {
+          window.location = "selectAlgorithm.html";
+        }
+      }
+
+      function initFileButton() {
+        const realFileBtn = document.getElementById("uploadedFile");
+        const customBtn = document.getElementById("uploadFileButton");
+        const customTxt = document.getElementById("uploadFileName");
+
+        customBtn.addEventListener("click", function() {
+          realFileBtn.click();
+        });
+
+        realFileBtn.addEventListener("change", function() {
+          if (realFileBtn.value) {
+            customTxt.innerHTML = realFileBtn.value.match(
+              /[\/\\]([\w\d\s\.\-\(\)]+)$/
+            )[1];
+          } else {
+            customTxt.innerHTML = "No file chosen, yet.";
+          }
+        });
+      }
+
+      function uploadData() {
+        if (checkUploadedFile()) {
+          document.getElementById("errorMsg").innerHTML="";
+          showLoading(true);
+          var callback = function(response) {
+            var uploadText=response;
+            if (uploadText=="File uploaded successfully")
+            {
+              showLoading(false);
+              addToSessionStorage("predictFileUploaded", true);
+              downloadPredictions();
+            }
+            else
+            {
+              document.getElementById("errorMsg").innerHTML = uploadText;
+            }
+          };
+          var url = "http://127.0.0.1:5000/predictFile";
+          var file=document.getElementById("uploadedFile").files[0];
+          var headerFlag = document.getElementById("headerFlag");
+          var form_data = new FormData();
+          form_data.append('file',file);
+          form_data.append('headerFlag',headerFlag.checked);
+          makeRequest(url, form_data, "POST", callback);
+        } else {
+          document.getElementById("errorMsg").innerHTML="No file Selected!";
+        }
+      }
+
+      function checkUploadedFile() {
+        if (document.getElementById("uploadedFile").files[0] == null) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+
+      function downloadPredictions() {
+        var url = "http://127.0.0.1:5000/downloadPrediction";
+        var callback = function(response) {
+          alert("File downloaded!");
+        };
+        makeRequest(url, null, "GET", callback);
+      }
+    </script>
+  </body>
+</html>
