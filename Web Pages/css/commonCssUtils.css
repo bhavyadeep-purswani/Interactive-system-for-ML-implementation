@@ -7,6 +7,9 @@ body {
 .heading-1 {
   font-size: 30px;
 }
+.heading-2 {
+  font-size: 25px;
+}
 .centered-text {
   text-align: center;
 }
@@ -19,8 +22,14 @@ body {
 .normal-text {
   font-size: 20px;
 }
+.small-text {
+  font-size: 18px;
+}
 .margin-top-normal {
   margin-top: 20px;
+}
+.margin-bottom-normal {
+  margin-bottom: 20px;
 }
 .margin-right-small {
   margin-right: 10px;

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Accuracy</title>
+    <script src="js/importCommonFiles.js" type="text/javascript"></script>
+    <style>
+
+    </style>
+  </head>
+  <body onload="init()">
+    <div id="cover-spin"></div>
+    <div class="heading-1 centered-text bold-text">
+      Accuracy
+    </div>
+    <div class="margin-top-extra-large normal-text centered-text" id="accuracy_text"></div>
+    <div class="margin-top-normal normal-text centered-text margin-bottom-normal">
+      Do you want to proceed with the trained model or train new model with 100% of dataset?
+    </div>
+      <div class="centered-text">
+        <button type="button" class="btn btn-secondary" id="newModel">Train new model</button>
+        <button type="button" class="btn btn-primary" id="proceed">Proceed</button>
+      </div>
+    <script type="text/javascript">
+      function init() {
+        checkModelTrained();
+        getAccuracyOfSelectedModel();
+        registerOnClickListener();
+      }
+
+      function registerOnClickListener() {
+        document.getElementById("proceed").addEventListener("click", function() {
+          goToUpload();
+        });
+        document.getElementById("newModel").addEventListener("click", function() {
+          var url = "http://127.0.0.1:5000/splitData";
+          var form_data = new FormData();
+          form_data.append("shuffle", "True");
+          form_data.append("testSize", "0");
+          form_data.append("randomSeed", "None");
+          makeRequest(url, form_data, "POST", trainModel);
+        });
+      }
+
+      function trainModel() {
+        var url = "http://127.0.0.1:5000/trainModel";
+        var form_data = new FormData();
+        form_data.append("algorithm", getFromSessionStorage("selectedAlgorithm"));
+        form_data.append("hyperparams", getFromSessionStorage("hyperParamRequest"));
+        makeRequest(url, form_data, "POST", goToUpload);
+      }
+
+      function goToUpload() {
+        addToSessionStorage("accuracyDisplayed", "True");
+        window.location = "uploadPredictFile.html";
+      }
+
+      function checkModelTrained() {
+        if (!getStrFromBool(getFromSessionStorage("ModelTrained", false))) {
+          window.location = "selectAlgorithm.html";
+        }
+      }
+
+      function getAccuracyOfSelectedModel() {
+        var url = "http://127.0.0.1:5000/evaluateModel";
+        var form_data = new FormData();
+        form_data.append("problemType", getFromSessionStorage("selectedProblemType", null));
+        var callback = function(response) {
+          if (getFromSessionStorage("selectedProblemType", null) == "Classification") {
+            document.getElementById("accuracy_text").innerHTML = "The accuracy of selected model is: <b>" + response + "%</b>";
+          } else {
+            document.getElementById("accuracy_text").innerHTML = "The RMSE of selected model is: <b>" + response + "</b>";
+          }
+        };
+        makeRequest(url, form_data, "POST", callback);
+      }
+    </script>
+  </body>
+</html>

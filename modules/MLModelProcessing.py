@@ -42,6 +42,8 @@ def createModel(algorithm,hyperparameters):
         else:
             max_depth = int(float(hyperparameters["max_depth"]))
         min_samples_leaf=float(hyperparameters["min_samples_leaf"])
+        if min_samples_leaf == int(min_samples_leaf):
+            min_samples_leaf = int(min_samples_leaf)
         max_features=hyperparameters["max_features"]
         if max_features not in HYPERPARAMETERS[Algorithms.Random_Forrest_Regressor]["max_features"]["options"]:
             max_features=int(float(max_features))

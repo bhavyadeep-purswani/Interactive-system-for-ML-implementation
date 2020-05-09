@@ -1,29 +1,236 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>Select Algorithm</title>
-    <script src="js/importCommonFiles.js" type="text/javascript"></script>
-    <style>
+<head>
+  <meta charset="utf-8">
+  <title>Select Algorithm</title>
+  <script src="js/importCommonFiles.js" type="text/javascript"></script>
+  <style>
 
-    </style>
-  </head>
-  <body onload="init()">
-    <div id="cover-spin"></div>
-    <div class="heading-1 centered-text bold-text">
-      Select Algorithm
+  </style>
+</head>
+<body onload="init()">
+  <div id="cover-spin"></div>
+  <div class="heading-1 centered-text bold-text">
+    Select Algorithm
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-5 offset-sm-4">
+        <form class="element-center margin-top-extra-large">
+          <div class="form-group">
+            <label for="algorithm" class="normal-text bold-text">Select the Algorithm:</label>
+            <select class="form-control" id="algorithm">
+            </select>
+          </div>
+          <div class="heading-2 bold-text margin-top-normal margin-bottom-normal">
+            Hyperparameters:
+          </div>
+          <div id = "hyperparams">
+
+          </div>
+          <div class="form-group">
+            <button class="btn btn-primary element-center" id="submit" type="button">Submit</button>
+          </div>
+        </form>
+      </div>
     </div>
-    <script type="text/javascript">
-      function init() {
-        checkProblemTypeSelected();
-        showLoading();
-      }
+  </div>
+  <script type="text/javascript">
+    var hyperParamsList = [];
 
-      function checkProblemTypeSelected() {
-        if (getFromSessionStorage("selectedProblemType", null) == null) {
-          window.location = "selectProblemType.html"
-        }
+    function init() {
+      checkProblemTypeSelected();
+      showLoading(true);
+      getPredictedAlgorithm();
+      setOnClickListener();
+    }
+
+    function checkProblemTypeSelected() {
+      if (getFromSessionStorage("selectedProblemType", null) == null) {
+        window.location = "selectProblemType.html"
       }
-    </script>
-  </body>
+    }
+
+    function getPredictedAlgorithm() {
+      var url = "http://127.0.0.1:5000/getPredictedAlgorithm";
+      var form_data = new FormData();
+      form_data.append("problemType", getFromSessionStorage("selectedProblemType", null));
+      var callback = function(response) {
+        getAlgorithmList(response);
+      };
+      makeRequest(url, form_data, "POST", callback);
+    }
+
+    function getAlgorithmList(predictedAlgorithm) {
+      var url = "http://127.0.0.1:5000/getAlgorithms";
+      var form_data = new FormData();
+      form_data.append("typeAlgorithm", getFromSessionStorage("selectedProblemType", null));
+      var callback = function(response) {
+        response = JSON.parse(response);
+        updateAlgorithmList(response.algorithms, predictedAlgorithm);
+      };
+      makeRequest(url, form_data, "POST", callback);
+    }
+
+    function updateAlgorithmList(alogrithmList, predictedAlgorithm) {
+      var parent = document.getElementById("algorithm");
+      alogrithmList.forEach((item, i) => {
+        var child = document.createElement("option");
+        child.value = item;
+        if (item == predictedAlgorithm) {
+          child.innerHTML = item + " (Recommended)";
+          child.selected = true;
+          getHyperParam(item);
+        } else {
+          child.innerHTML = item;
+        }
+        parent.appendChild(child);
+      });
+      parent.addEventListener("change", function() {
+        getHyperParam(parent.value);
+      });
+      showLoading(false);
+    }
+
+    function getHyperParam(algorithm) {
+      showLoading(true);
+      var url = "http://127.0.0.1:5000/getHyperparameters";
+      var form_data = new FormData();
+      form_data.append("algorithm", algorithm);
+      var callback = function(response) {
+        response = JSON.parse(response);
+        showHyperParams(response.hyperparameters);
+        showLoading(false);
+      };
+      makeRequest(url, form_data, "POST", callback);
+    }
+
+    function showHyperParams(hyperparameters) {
+      var parent = document.getElementById("hyperparams");
+      parent.innerHTML = "";
+      hyperParamsList = [];
+      Object.keys(hyperparameters).forEach(function(key) {
+        hyperParamsList.push(key);
+        var child = document.createElement("div");
+        child.classList.add("form-group");
+        var grandChild1 = document.createElement("label");
+        grandChild1.htmlFor = key;
+        grandChild1.classList.add("small-text");
+        grandChild1.classList.add("bold-text");
+        grandChild1.innerHTML = key;
+        child.appendChild(grandChild1);
+        paramTypes = Object.values(hyperparameters[key]["paramType"]);
+        options = Object.values(hyperparameters[key]["options"]);
+        if (options.length != 0) {
+          var grandChild2 = document.createElement("select");
+          grandChild2.classList.add("form-control");
+          grandChild2.id = key;
+          options.forEach((item, i) => {
+            var option = document.createElement("option");
+            option.value = item;
+            option.innerHTML = item;
+            if (item == hyperparameters[key]["default"]) {
+              option.selected = "true";
+            }
+            grandChild2.appendChild(option);
+          });
+          if (paramTypes.length > 1) {
+            var option = document.createElement("option");
+            option.value = "custom";
+            option.innerHTML = "Custom Value";
+            grandChild2.addEventListener("change", function() {
+              if (grandChild2.value == "custom") {
+                var grandChild3 = document.createElement("input");
+                grandChild3.setAttribute("type", "text");
+                grandChild3.classList.add("form-control");
+                grandChild3.classList.add("margin-top-normal");
+                grandChild3.id = key + "custom";
+                child.appendChild(grandChild3);
+              } else {
+                document.getElementById(key+"custom") != null ? document.getElementById(key+"custom").remove() : "";
+              }
+            });
+            grandChild2.appendChild(option);
+          }
+          child.appendChild(grandChild2);
+        } else {
+          var grandChild2 = document.createElement("input");
+          grandChild2.id = key;
+          grandChild2.setAttribute("type", "text");
+          grandChild2.classList.add("form-control");
+          grandChild2.value = hyperparameters[key]["default"];
+          child.appendChild(grandChild2);
+          if (hyperparameters[key]["help_text"]!= undefined) {
+            var grandChild3 = document.createTextNode("("+hyperparameters[key]["help_text"]+")");
+            child.appendChild(grandChild3);
+          }
+        }
+        var errorDiv = document.createElement("div");
+        errorDiv.classList.add("error-text");
+        errorDiv.classList.add("margin-top-normal");
+        errorDiv.id = key + "Error";
+        child.appendChild(errorDiv);
+        parent.appendChild(child);
+      });
+    }
+
+    function setOnClickListener() {
+      document.getElementById("submit").addEventListener("click", trainModel);
+    }
+
+    function trainModel() {
+      if (!validate()) {
+        return false;
+      }
+      showLoading(true);
+      var url = "http://127.0.0.1:5000/trainModel";
+      var form_data = new FormData();
+      form_data.append("algorithm", document.getElementById("algorithm").value);
+      var param = {};
+      hyperParamsList.forEach((item, i) => {
+        if (document.getElementById(item).value == "custom") {
+          param[item] = document.getElementById(item+"custom").value;
+        } else {
+          param[item] = document.getElementById(item).value;
+        }
+      });
+
+      var callback = function(response) {
+        addToSessionStorage("ModelTrained", "True");
+        showLoading(false);
+        window.location = "displayAccuracy.html";
+      };
+      var paramRequest = {
+        "hyperparameters" : param
+      };
+      addToSessionStorage("hyperParamRequest", JSON.stringify(paramRequest));
+      addToSessionStorage("selectedAlgorithm", document.getElementById("algorithm").value);
+      form_data.append("hyperparams", JSON.stringify(paramRequest));
+      makeRequest(url, form_data, "POST", callback);
+    }
+
+
+    function validate() {
+      var validity = true;
+      hyperParamsList.forEach((item, i) => {
+        if (document.getElementById(item).value == "custom") {
+          if (document.getElementById(item+"custom") != null && document.getElementById(item+"custom").value == "") {
+            document.getElementById(item+"Error").innerHTML = "Please enter valid value";
+            validity =  false;
+          } else {
+            document.getElementById(item+"Error").innerHTML = "";
+          }
+        } else {
+          if (document.getElementById(item) != null && document.getElementById(item).value == "") {
+            document.getElementById(item+"Error").innerHTML = "Please enter valid value";
+            validity =  false;
+          } else {
+            document.getElementById(item+"Error").innerHTML = "";
+          }
+        }
+      });
+      return validity;
+    }
+  </script>
+</body>
 </html>
