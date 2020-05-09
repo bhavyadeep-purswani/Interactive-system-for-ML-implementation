@@ -28,7 +28,7 @@
       ] ,
       "options": [] ,
       "default": 1,
-      "help_text": "min_samples_leaf must be in (0, 0.5]"
+      "help_text": " min_samples_leaf must be at least 1 or in (0, 0.5]"
     } ,
     "max_features": {
       "paramType": [
@@ -71,7 +71,7 @@
       ] ,
       "default": "uniform"
     } ,
-    "algorithm": {
+    "nearest neighbors algorithm": {
       "paramType": [
         "str"
       ] ,
@@ -163,8 +163,7 @@
         "rbf" ,
         "sigmoid" ,
         "poly" ,
-        "linear" ,
-        "precomputed"
+        "linear"
       ] ,
       "default": "rbf"
     } ,
@@ -212,8 +211,7 @@
         "rbf" ,
         "sigmoid" ,
         "poly" ,
-        "linear" ,
-        "precomputed"
+        "linear"
       ] ,
       "default": "rbf"
     } ,
@@ -273,7 +271,8 @@
       ] ,
       "options": [
         "identity" ,
-        "logistictanh" ,
+        "logistic",
+        "tanh" ,
         "relu"
       ] ,
       "default": "relu"
@@ -323,7 +322,8 @@
       ] ,
       "options": [
         "identity" ,
-        "logistictanh" ,
+        "logistic",
+        "tanh" ,
         "relu"
       ] ,
       "default": "relu"

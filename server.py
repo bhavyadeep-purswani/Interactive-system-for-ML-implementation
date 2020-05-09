@@ -115,7 +115,7 @@ def removeColumns():
     if (isinstance(dataset.columns[0], str) == False):
         removeColumns = list(map(int, removeColumns))
     dataset.drop(removeColumns, axis=1, inplace=True)
-    preprocessingActions += "\n\tdataset.drop({0},axis=1,inplace=True)".format(str(removeColumns))
+    preprocessingActions += "\n\tdataset.drop(['{0}'],axis=1,inplace=True)".format(str(removeColumns))
     return "successfully removed columns"
 
 
@@ -161,13 +161,10 @@ def removeNullValues():
             dataset = dropNullRows(dataset, columnName)
             targetData = dataset["target"]
             dataset.drop(['target'], axis = 1, inplace = True)
-            preprocessingActions += "\n\tdataset['target']=targetData.values"
             preprocessingActions += "\n\tdataset=dropNullRows(dataset,'{0}')".format(columnName)
-            preprocessingActions += "\n\ttargetData = dataset['target']"
-            preprocessingActions += "\n\tdataset.drop(['target'], axis = 1, inplace = True)"
         elif nullHandler == "dropColumn":
             dataset.drop([columnName], axis=1, inplace=True)
-            preprocessingActions += "\n\tdataset.drop([{0}],axis=1,inplace=True)".format(columnName)
+            preprocessingActions += "\n\tdataset.drop(['{0}'],axis=1,inplace=True)".format(columnName)
     return "Success"
 
 
@@ -225,10 +222,12 @@ def labelEncodeColumns():
     columnNames = checkForStrings(dataset)
     for col in columnNames:
         data, labelEncoder = labelEncode(dataset[[col]], None)
+        le_dict = dict(zip(labelEncoder.classes_, labelEncoder.transform(labelEncoder.classes_)))
+        params['lab_dict' + col] = le_dict
         params['lab' + col] = labelEncoder
-        preprocessingActions += "\n\tdata = labelEncode(dataset[['{0}']],params['lab'+'{0}'])".format(col)
+        preprocessingActions += "\n\tdataset.{0} = fix_unknown_values(dataset.{0},params['lab_dict'+'{0}'],params['lab'+'{0}'])".format(col)
         dataset[col] = data
-        preprocessingActions += "\n\tdataset['{0}']=data".format(col)
+        #preprocessingActions += "\n\tdataset['{0}']=data".format(col)
     return "Success"
 
 
@@ -362,6 +361,7 @@ def sendStandardizeData():
         dataset = pd.DataFrame(dataset, columns=columns)
         params['stan'] = enc
         preprocessingActions += "\n\tdataset = standardizeData(dataset,'{0}',params['stan'])".format(standardizeType)
+
     return "success"
 
 
