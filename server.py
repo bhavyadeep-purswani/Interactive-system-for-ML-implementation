@@ -115,7 +115,7 @@ def removeColumns():
     if (isinstance(dataset.columns[0], str) == False):
         removeColumns = list(map(int, removeColumns))
     dataset.drop(removeColumns, axis=1, inplace=True)
-    preprocessingActions += "\n\tdataset.drop({0},axis=1,inplace=True)".format(str(removeColumns))
+    preprocessingActions += "\n\tdataset.drop(['{0}'],axis=1,inplace=True)".format(str(removeColumns))
     return "successfully removed columns"
 
 
