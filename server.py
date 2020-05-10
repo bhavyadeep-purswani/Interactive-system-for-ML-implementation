@@ -115,7 +115,7 @@ def removeColumns():
     if (isinstance(dataset.columns[0], str) == False):
         removeColumns = list(map(int, removeColumns))
     dataset.drop(removeColumns, axis=1, inplace=True)
-    preprocessingActions += "\n\tdataset.drop(['{0}'],axis=1,inplace=True)".format(str(removeColumns))
+    preprocessingActions += "\n\tdataset.drop({0},axis=1,inplace=True)".format(str(removeColumns))
     return "successfully removed columns"
 
 
@@ -225,7 +225,7 @@ def labelEncodeColumns():
         le_dict = dict(zip(labelEncoder.classes_, labelEncoder.transform(labelEncoder.classes_)))
         params['lab_dict' + col] = le_dict
         params['lab' + col] = labelEncoder
-        preprocessingActions += "\n\tdataset.{0} = fix_unknown_values(dataset.{0},params['lab_dict'+'{0}'],params['lab'+'{0}'])".format(col)
+        preprocessingActions += "\n\tdataset['{0}'] = fix_unknown_values(dataset['{0}'],params['lab_dict'+'{0}'],params['lab'+'{0}'])".format(col)
         dataset[col] = data
         #preprocessingActions += "\n\tdataset['{0}']=data".format(col)
     return "Success"
