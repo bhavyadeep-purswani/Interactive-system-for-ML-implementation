@@ -218,6 +218,7 @@ def getCategoricalColumns():
 @app.route('/labelEncodeColumns', methods=['GET'])
 def labelEncodeColumns():
     global dataset, preprocessingActions, params
+
     preprocessingActions = appendAllNulls(preprocessingActions)
     columnNames = checkForStrings(dataset)
     for col in columnNames:
@@ -421,11 +422,14 @@ def evaluate():
 def predictFile():
     global modFit, predictedData
     global params, preprocessingActions
+    global dataset
     headerFlag = strToBool(request.form["headerFlag"])
     responseData, fileName = uploadFile(ALLOWED_EXTENSIONS, app.config['UPLOAD_FOLDER'])
     if fileName is not None:
         testDataset = loadData(fileName, headerFlag)
         params['dataset'] = testDataset
+        print(testDataset.dtypes)
+        print(dataset.dtypes)
         preprocessedData = fetchPreProcessData(params, preprocessingActions)
         predictedData= predict(modFit, preprocessedData)
     return "success"

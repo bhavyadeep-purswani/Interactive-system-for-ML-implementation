@@ -62,7 +62,7 @@
           showLoading(true);
           var callback = function(response) {
             var uploadText=response;
-            if (uploadText=="File uploaded successfully")
+            if (uploadText=="success")
             {
               showLoading(false);
               addToSessionStorage("predictFileUploaded", true);
@@ -95,10 +95,7 @@
 
       function downloadPredictions() {
         var url = "http://127.0.0.1:5000/downloadPrediction";
-        var callback = function(response) {
-          alert("File downloaded!");
-        };
-        makeRequest(url, null, "GET", callback);
+        makeDownloadRequest(url, null, "GET");
       }
     </script>
   </body>
