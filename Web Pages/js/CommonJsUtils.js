@@ -69,6 +69,8 @@ function makeRequest(url, formData, method, callback) {
             xhr.send(formData);
           }
           retryAttempts += 1;
+        } else {
+          //show error occured
         }
       }
     }
@@ -78,6 +80,46 @@ function makeRequest(url, formData, method, callback) {
   } else {
     xhr.send(formData);
   }
+}
+
+function makeDownloadRequest(url, formData, method) {
+  var xhr = new XMLHttpRequest();
+  xhr.open(method, url, true);
+  xhr.responseType = 'blob';
+  var retryAttempts = 0;
+  xhr.onreadystatechange = function ()
+  {
+    if (xhr.readyState === 4)
+    {
+      if (xhr.status === 200) {
+        var blob = xhr.response;
+        var fileName = "predictions" + Math.floor(Math.random() * 100) + ".csv";
+        saveBlob(blob, fileName);
+      } else {
+        if (retryAttempts < 5) {
+          xhr.open(method, url, true);
+          if (method == "GET" || method == "get" || formData == null) {
+            xhr.send();
+          } else {
+            xhr.send(formData);
+          }
+          retryAttempts += 1;
+        }
+      }
+    }
+  };
+  if (method == "GET" || method == "get" || formData == null) {
+    xhr.send();
+  } else {
+    xhr.send(formData);
+  }
+}
+
+function saveBlob(blob, fileName) {
+    var a = document.createElement('a');
+    a.href = window.URL.createObjectURL(blob);
+    a.download = fileName;
+    a.dispatchEvent(new MouseEvent('click'));
 }
 
 function getStrFromBool(bool) {

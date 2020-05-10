@@ -12,7 +12,8 @@
         "int"
       ] ,
       "options": [] ,
-      "default": "None"
+      "default": "None",
+      "help_text": "Negative values not accepted"
     } ,
     "min_samples_split": {
       "paramType": [
@@ -26,7 +27,8 @@
         "float"
       ] ,
       "options": [] ,
-      "default": 1
+      "default": 1,
+      "help_text": " min_samples_leaf must be at least 1 or in (0, 0.5]"
     } ,
     "max_features": {
       "paramType": [
@@ -38,14 +40,16 @@
         "log2" ,
         "sqrt"
       ] ,
-      "default": "auto"
+      "default": "auto",
+      "help_text": "max_features must be in (0, n_features]"
     } ,
     "max_leaf_nodes": {
       "paramType": [
         "int"
       ] ,
       "options": [] ,
-      "default": "None"
+      "default": "None",
+      "help_text": "max_leaf_nodes 1 must be either None or larger than 1"
     }
   } ,
   "KNeighbors Classifier": {
@@ -54,7 +58,8 @@
         "int"
       ] ,
       "options": [] ,
-      "default": 5
+      "default": 5,
+      "help_text": "Expected n_neighbors > 0"
     } ,
     "weights": {
       "paramType": [
@@ -66,7 +71,7 @@
       ] ,
       "default": "uniform"
     } ,
-    "algorithm": {
+    "nearest neighbors algorithm": {
       "paramType": [
         "str"
       ] ,
@@ -83,7 +88,8 @@
         "int"
       ] ,
       "options": [] ,
-      "default": 30
+      "default": 30,
+      "help_text": "leaf_size must be greater than or equal to 1 and Negative values not accepted\""
     }
   } ,
   "Random Forrest Regressor": {
@@ -92,21 +98,31 @@
         "int"
       ] ,
       "options": [] ,
-      "default": 10
+      "default": 100,
+      "help_text": "Negative values not accepted"
     } ,
     "max_depth": {
       "paramType": [
         "int"
       ] ,
       "options": [] ,
-      "default": "None"
+      "default": "None",
+      "help_text": "Negative values not accepted"
+    } ,
+    "min_samples_split": {
+      "paramType": [
+        "float"
+      ] ,
+      "options": [] ,
+      "default": 2
     } ,
     "min_samples_leaf": {
       "paramType": [
         "float"
       ] ,
       "options": [] ,
-      "default": 1
+      "default": 1,
+      "help_text": "min_samples_leaf must be in (0, 0.5]"
     } ,
     "max_features": {
       "paramType": [
@@ -118,23 +134,16 @@
         "log2" ,
         "sqrt"
       ] ,
-      "default": "auto"
+      "default": "auto",
+      "help_text": "max_features must be in (0, n_features] "
     } ,
     "max_leaf_nodes": {
       "paramType": [
         "int"
       ] ,
       "options": [] ,
-      "default": "None"
-    }
-  } ,
-  "Linear Regression": {
-    "fit_intercept": {
-      "paramType": [
-        "bool"
-      ] ,
-      "options": [] ,
-      "default": "True"
+      "default": "None",
+      "help_text": "max_leaf_nodes must be either None or larger than 1 and Negative values not accepted"
     }
   } ,
   "SVM Regression": {
@@ -143,7 +152,8 @@
         "float"
       ] ,
       "options": [] ,
-      "default": 1.0
+      "default": 1.0,
+      "help_text": "Invalid values are [0,1)  and Negative values not accepted"
     } ,
     "kernel": {
       "paramType": [
@@ -162,7 +172,8 @@
         "int"
       ] ,
       "options": [] ,
-      "default": 3
+      "default": 3,
+      "help_text": "Negative values not accepted"
     } ,
     "gamma": {
       "paramType": [
@@ -189,7 +200,8 @@
         "float"
       ] ,
       "options": [] ,
-      "default": 1.0
+      "default": 1.0,
+      "help_text": "Invalid values are [0,1) and Negative values not accepted\" "
     } ,
     "kernel": {
       "paramType": [
@@ -199,8 +211,7 @@
         "rbf" ,
         "sigmoid" ,
         "poly" ,
-        "linear" ,
-        "precomputed"
+        "linear"
       ] ,
       "default": "rbf"
     } ,
@@ -209,7 +220,8 @@
         "int"
       ] ,
       "options": [] ,
-      "default": 3
+      "default": 3,
+      "help_text": "Negative values not accepted"
     } ,
     "gamma": {
       "paramType": [
@@ -220,14 +232,16 @@
         "scale" ,
         "auto"
       ] ,
-      "default": "scale"
+      "default": "scale",
+      "help_text": "The gamma value of [0,1) is  and Negative values not accepted\" "
     } ,
     "max_iter": {
       "paramType": [
         "int"
       ] ,
       "options": [] ,
-      "default": -1
+      "default": -1,
+      "help_text": "The value of [0,1) is invalid and Negative values not accepted\""
     }
   } ,
   "Gaussian Naive Bayes": {
@@ -236,7 +250,8 @@
         "float"
       ] ,
       "options": [] ,
-      "default": 1e-09
+      "default": 1e-09,
+      "help_text": "Negative values not accepted"
     }
   } ,
   "Neural Network Classification": {
@@ -245,9 +260,8 @@
         "int"
       ] ,
       "options": [] ,
-      "default": [
-        100
-      ]
+      "default": 100,
+      "help_text": "The value of [0,1) is invalid and Negative values not accepted\""
     } ,
     "activation": {
       "paramType": [
@@ -255,7 +269,8 @@
       ] ,
       "options": [
         "identity" ,
-        "logistictanh" ,
+        "logistic",
+        "tanh" ,
         "relu"
       ] ,
       "default": "relu"
@@ -265,7 +280,8 @@
         "float"
       ] ,
       "options": [] ,
-      "default": 0.0001
+      "default": 0.0001,
+      "help_text": "Negative values not accepted"
     } ,
     "learning_rate": {
       "paramType": [
@@ -283,18 +299,18 @@
         "int"
       ] ,
       "options": [] ,
-      "default": 200
+      "default": 200,
+      "help_text": "The value of [0,1) is invalid and Negative values not accepted\""
     }
   },
   "Neural Network Regression": {
-    "hidden_layer_sizes": {
+     "hidden_layer_sizes": {
       "paramType": [
         "int"
       ] ,
       "options": [] ,
-      "default": [
-        100
-      ]
+      "default": 100,
+      "help_text": "The value of [0,1) is invalid and Negative values not accepted\" "
     } ,
     "activation": {
       "paramType": [
@@ -302,7 +318,8 @@
       ] ,
       "options": [
         "identity" ,
-        "logistictanh" ,
+        "logistic",
+        "tanh" ,
         "relu"
       ] ,
       "default": "relu"
@@ -330,7 +347,18 @@
         "int"
       ] ,
       "options": [] ,
-      "default": 200
+      "default": 200,
+      "help_text": "The value of [0,1) is invalid  and Negative values not accepted"
+    }
+  },
+  "Linear Regression": {
+    "fit_intercept": {
+      "paramType": [
+        "bool"
+      ] ,
+      "options": [] ,
+      "default": "True",
+      "help_text": "Value can be either True or False."
     }
   }
 }

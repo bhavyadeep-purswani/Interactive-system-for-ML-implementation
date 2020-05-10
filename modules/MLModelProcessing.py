@@ -15,7 +15,6 @@ from modules.utilities import strToBool
 #function to create MachineLearning Model
 def createModel(algorithm,hyperparameters):
     HYPERPARAMETERS = json.loads(open(HYPERPARAMETERSFILE, "r").read())
-    print(type(HYPERPARAMETERS))
     if algorithm==Algorithms.Linear_Regression:
         fit_intercept= strToBool(hyperparameters["fit_intercept"])
         mod=LinearRegression(fit_intercept=fit_intercept)

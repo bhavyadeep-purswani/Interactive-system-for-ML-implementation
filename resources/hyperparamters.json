@@ -260,9 +260,7 @@
         "int"
       ] ,
       "options": [] ,
-      "default": [
-        100
-      ],
+      "default": 100,
       "help_text": "The value of [0,1) is invalid and Negative values not accepted\""
     } ,
     "activation": {
@@ -311,9 +309,7 @@
         "int"
       ] ,
       "options": [] ,
-      "default": [
-        100
-      ],
+      "default": 100,
       "help_text": "The value of [0,1) is invalid and Negative values not accepted\" "
     } ,
     "activation": {
