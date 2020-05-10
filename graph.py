@@ -97,7 +97,8 @@ def plotGraph():
     mapping=""
     if(str(data[y_attr].dtype)=="object"):
         le = preprocessing.LabelEncoder()
-        data[y_attr]=le.fit_transform(data[y_attr])
+        #data[y_attr]=le.fit_transform(data[y_attr])
+        yattr = le.fit_transform(data[y_attr])
         le_name_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
         mapping+="\tMAPPING"
         for x in le_name_mapping:
@@ -109,20 +110,20 @@ def plotGraph():
         p = figure(plot_width=1000, plot_height=1000)
         xlabel=""
         for x in x_attr:
-            p.vbar(x=data[x], width=1.5, bottom=0,top=data[y_attr],color=hexColour(),legend=x)
+            p.vbar(x=data[x], width=1.5, bottom=0,top=yattr,color=hexColour(),legend=x)
             xlabel+=" "
             xlabel+=x
         p.xaxis.axis_label =xlabel
         p.yaxis.axis_label = y_attr
         t = Title()
-        t.text = "graph:" + graph + " x:" + x + mapping
+        t.text = "graph:" + graph + " x:" + xlabel + mapping
         p.title = t
         show(p)
         return "SUCCESS"
     if graph=="scatter":
         p = figure(plot_width=600, plot_height=600)
         for x in x_attr:
-            p.scatter(data[x], data[y_attr], marker="x",line_color=hexColour(), fill_color=hexColour(), fill_alpha=0.5, size=12,legend=x)
+            p.scatter(data[x], yattr, marker="x",line_color=hexColour(), fill_color=hexColour(), fill_alpha=0.5, size=12,legend=x)
         t = Title()
         t.text = "graph:" + graph + " x:" + str(x_attr)+mapping
         p.title = t
@@ -132,7 +133,7 @@ def plotGraph():
         l=[]
         for x in x_attr:
             p = figure(plot_width=600, plot_height=600)
-            p.line(data[x], data[y_attr],color=hexColour(),legend=x)
+            p.line(data[x], yattr,color=hexColour(),legend=x)
             p.xaxis.axis_label =x
             p.yaxis.axis_label = y_attr
             #title = graph + " " + xlabel + " " + y_attr

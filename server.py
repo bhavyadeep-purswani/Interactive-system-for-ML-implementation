@@ -12,19 +12,17 @@ from flask import Flask, request, make_response, send_file, render_template
 from flask_cors import CORS
 from sklearn.model_selection import train_test_split
 import threading
-import time,os
+import time, os
 import webbrowser
 from PredictionLayer import getPredictedNullValueHandler, getPredictedProblemType, trainProblemTypePredictor, \
     predictAlgorithm
 from modules.MLModelProcessing import createModel, createModelFit, evaluateModel, predict
 from modules.constants import UPLOAD_FOLDER, ALLOWED_EXTENSIONS, GRAPH_URL, HYPERPARAMETERSFILE, \
     ProblemType, Algorithms
-from modules.fileprocessing import loadData, fileHead, uploadFile, fileHeadFiltered
+from modules.fileprocessing import loadData, fileHead, uploadFile, fileHeadFiltered, fullFile
 from modules.preprocess import standardizeData, containsNull, fillCustom, fillMean, fillMedian, fillMostCommon, \
     dropNullRows, fillForward, fillBackward, labelEncode, oneHotEncode, getNumberOfNullValues
 from modules.utilities import strToBool, checkForStrings, fetchPreProcessData, appendAllNulls
-
-
 
 # global variables
 global trainFileName
@@ -53,6 +51,14 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def trainHead():
     global dataset
     r = fileHead(dataset)
+    return r
+
+
+# Function to return the complete of dataframe
+@app.route('/trainHead', methods=['GET'])
+def trainDataset():
+    global dataset
+    r = fullFile(dataset)
     return r
 
 
@@ -160,7 +166,7 @@ def removeNullValues():
             dataset["target"] = targetData.values
             dataset = dropNullRows(dataset, columnName)
             targetData = dataset["target"]
-            dataset.drop(['target'], axis = 1, inplace = True)
+            dataset.drop(['target'], axis=1, inplace=True)
             preprocessingActions += "\n\tdataset=dropNullRows(dataset,'{0}')".format(columnName)
         elif nullHandler == "dropColumn":
             dataset.drop([columnName], axis=1, inplace=True)
@@ -214,6 +220,7 @@ def getCategoricalColumns():
             columns.append(col)
     return json.dumps({'columnList': columns}, ensure_ascii=True, allow_nan=True)
 
+
 # Api to label encode
 @app.route('/labelEncodeColumns', methods=['GET'])
 def labelEncodeColumns():
@@ -226,9 +233,10 @@ def labelEncodeColumns():
         le_dict = dict(zip(labelEncoder.classes_, labelEncoder.transform(labelEncoder.classes_)))
         params['lab_dict' + col] = le_dict
         params['lab' + col] = labelEncoder
-        preprocessingActions += "\n\tdataset['{0}'] = fix_unknown_values(dataset['{0}'],params['lab_dict'+'{0}'],params['lab'+'{0}'])".format(col)
+        preprocessingActions += "\n\tdataset['{0}'] = fix_unknown_values(dataset['{0}'],params['lab_dict'+'{0}'],params['lab'+'{0}'])".format(
+            col)
         dataset[col] = data
-        #preprocessingActions += "\n\tdataset['{0}']=data".format(col)
+        # preprocessingActions += "\n\tdataset['{0}']=data".format(col)
     return "Success"
 
 
@@ -298,9 +306,9 @@ def data():
 # Function to call graph module
 @app.route('/callGraph')
 def callGraph():
-    global dataset,targetData
+    global dataset, targetData
 
-    graphDataset=pd.concat([dataset,targetData],axis=1)
+    graphDataset = pd.concat([dataset, targetData], axis=1)
     graphData = graphDataset.values.tolist()
     graphMetaData = list(graphDataset.columns)
     requestData = {'graphData': graphData, 'graphMetaData': graphMetaData}
@@ -317,11 +325,12 @@ def newFunc():
 
 @app.route('/graphModule')
 def graphModule():
-    t1 = threading.Thread(target=newFunc)
-    t1.start()
-    time.sleep(10)
+    # t1 = threading.Thread(target=newFunc)
+    # t1.start()
+    # time.sleep(10)
     webbrowser.open_new_tab("Web Pages\graph.html")
     return "SUCCESS"
+
 
 # Function to split data
 @app.route('/splitData', methods=['POST'])
@@ -336,10 +345,12 @@ def splitData():
         randomSeed = int(request.form['randomSeed'])
     else:
         randomSeed = None
-    if(testSize==0.0):
-        X_train, X_test, y_train, y_test=dataset,pd.DataFrame({'A' : [np.nan]}),targetData,pd.DataFrame({'A' : [np.nan]})
+    if (testSize == 0.0):
+        X_train, X_test, y_train, y_test = dataset, pd.DataFrame({'A': [np.nan]}), targetData, pd.DataFrame(
+            {'A': [np.nan]})
     else:
-        X_train, X_test, y_train, y_test = train_test_split(dataset, targetData, train_size=testSize, random_state=randomSeed, shuffle=shuffle)
+        X_train, X_test, y_train, y_test = train_test_split(dataset, targetData, train_size=testSize,
+                                                            random_state=randomSeed, shuffle=shuffle)
     return "Success"
 
 
@@ -390,7 +401,7 @@ def getPredictedAlgorithm():
 @app.route('/getHyperparameters', methods=['POST'])
 def getHyperparameters():
     algorithm = request.form['algorithm']
-    HYPERPARAMETERS=json.loads(open(HYPERPARAMETERSFILE, "r").read())
+    HYPERPARAMETERS = json.loads(open(HYPERPARAMETERSFILE, "r").read())
     responseData = {"hyperparameters": HYPERPARAMETERS[algorithm]}
     r = make_response(responseData)
     r.mimetype = 'text/plain'
@@ -413,8 +424,8 @@ def evaluate():
     global mod, modFit
     global X_test, y_test
     responseData = evaluateModel(modFit, X_test, y_test, request.form['problemType'])
-    #r = make_response(responseData)
-    #r.mimetype = 'text/plain'
+    # r = make_response(responseData)
+    # r.mimetype = 'text/plain'
     return str(responseData)
 
 
@@ -428,10 +439,8 @@ def predictFile():
     if fileName is not None:
         testDataset = loadData(fileName, headerFlag)
         params['dataset'] = testDataset
-        print(testDataset.dtypes)
-        print(dataset.dtypes)
         preprocessedData = fetchPreProcessData(params, preprocessingActions)
-        predictedData= predict(modFit, preprocessedData)
+        predictedData = predict(modFit, preprocessedData)
     return "success"
 
 
@@ -441,7 +450,7 @@ def downloadPrediction():
     # pd.DataFrame(predictedData).to_csv(".\generated\predictions.csv") #Windows
     # return send_file(".\generated\\predictions.csv", as_attachment=True) #For windows
     pd.DataFrame(predictedData).to_csv("generated/predictions.csv")
-    return send_file("generated/predictions.csv", as_attachment=True)
+    return send_file("generated/predictions.csv", as_attachment=True, cache_timeout=1)
 
 
 if __name__ == '__main__':

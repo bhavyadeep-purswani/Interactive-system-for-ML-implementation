@@ -69,6 +69,8 @@ function makeRequest(url, formData, method, callback) {
             xhr.send(formData);
           }
           retryAttempts += 1;
+        } else {
+          //show error occured
         }
       }
     }
@@ -91,7 +93,7 @@ function makeDownloadRequest(url, formData, method) {
     {
       if (xhr.status === 200) {
         var blob = xhr.response;
-        var fileName = "predictions.csv";
+        var fileName = "predictions" + Math.floor(Math.random() * 100) + ".csv";
         saveBlob(blob, fileName);
       } else {
         if (retryAttempts < 5) {
