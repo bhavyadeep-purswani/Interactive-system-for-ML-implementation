@@ -161,13 +161,10 @@ def removeNullValues():
             dataset = dropNullRows(dataset, columnName)
             targetData = dataset["target"]
             dataset.drop(['target'], axis = 1, inplace = True)
-            preprocessingActions += "\n\tdataset['target']=targetData.values"
             preprocessingActions += "\n\tdataset=dropNullRows(dataset,'{0}')".format(columnName)
-            preprocessingActions += "\n\ttargetData = dataset['target']"
-            preprocessingActions += "\n\tdataset.drop(['target'], axis = 1, inplace = True)"
         elif nullHandler == "dropColumn":
             dataset.drop([columnName], axis=1, inplace=True)
-            preprocessingActions += "\n\tdataset.drop([{0}],axis=1,inplace=True)".format(columnName)
+            preprocessingActions += "\n\tdataset.drop(['{0}'],axis=1,inplace=True)".format(columnName)
     return "Success"
 
 
@@ -221,14 +218,17 @@ def getCategoricalColumns():
 @app.route('/labelEncodeColumns', methods=['GET'])
 def labelEncodeColumns():
     global dataset, preprocessingActions, params
+
     preprocessingActions = appendAllNulls(preprocessingActions)
     columnNames = checkForStrings(dataset)
     for col in columnNames:
         data, labelEncoder = labelEncode(dataset[[col]], None)
+        le_dict = dict(zip(labelEncoder.classes_, labelEncoder.transform(labelEncoder.classes_)))
+        params['lab_dict' + col] = le_dict
         params['lab' + col] = labelEncoder
-        preprocessingActions += "\n\tdata = labelEncode(dataset[['{0}']],params['lab'+'{0}'])".format(col)
+        preprocessingActions += "\n\tdataset['{0}'] = fix_unknown_values(dataset['{0}'],params['lab_dict'+'{0}'],params['lab'+'{0}'])".format(col)
         dataset[col] = data
-        preprocessingActions += "\n\tdataset['{0}']=data".format(col)
+        #preprocessingActions += "\n\tdataset['{0}']=data".format(col)
     return "Success"
 
 
@@ -362,6 +362,7 @@ def sendStandardizeData():
         dataset = pd.DataFrame(dataset, columns=columns)
         params['stan'] = enc
         preprocessingActions += "\n\tdataset = standardizeData(dataset,'{0}',params['stan'])".format(standardizeType)
+
     return "success"
 
 
@@ -421,11 +422,14 @@ def evaluate():
 def predictFile():
     global modFit, predictedData
     global params, preprocessingActions
+    global dataset
     headerFlag = strToBool(request.form["headerFlag"])
     responseData, fileName = uploadFile(ALLOWED_EXTENSIONS, app.config['UPLOAD_FOLDER'])
     if fileName is not None:
         testDataset = loadData(fileName, headerFlag)
         params['dataset'] = testDataset
+        print(testDataset.dtypes)
+        print(dataset.dtypes)
         preprocessedData = fetchPreProcessData(params, preprocessingActions)
         predictedData= predict(modFit, preprocessedData)
     return "success"

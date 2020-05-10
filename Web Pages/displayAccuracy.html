@@ -15,11 +15,12 @@
     </div>
     <div class="margin-top-extra-large normal-text centered-text" id="accuracy_text"></div>
     <div class="margin-top-normal normal-text centered-text margin-bottom-normal">
-      Do you want to proceed with the trained model or train new model with 100% of dataset?
+      Do you want to predict with the trained model or train new model with 100% of dataset?
     </div>
       <div class="centered-text">
+        <button type="button" class="btn btn-info" id="goBack">Change Algorithm</button>
         <button type="button" class="btn btn-secondary" id="newModel">Train new model</button>
-        <button type="button" class="btn btn-primary" id="proceed">Proceed</button>
+        <button type="button" class="btn btn-primary" id="proceed">Predict</button>
       </div>
     <script type="text/javascript">
       function init() {
@@ -29,6 +30,9 @@
       }
 
       function registerOnClickListener() {
+        document.getElementById("goBack").addEventListener("click", function() {
+          window.location = "selectAlgorithm.html";
+        });
         document.getElementById("proceed").addEventListener("click", function() {
           goToUpload();
         });
