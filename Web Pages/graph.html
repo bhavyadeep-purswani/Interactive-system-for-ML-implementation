@@ -14,8 +14,8 @@
       Plot a Graph
     </div>
     <div id="tableDiv"></div><br>
-    <form>
-    <div class="container">
+    <form id="form">
+    <div class="container" >
       <div class="row">
         <div class="col-sm-10 offset-sm-2">
           <div class="margin-top-normal form-inline">
@@ -30,8 +30,10 @@
             <select class="form-control mb-2 mr-sm-2" id="selectY" required>
             </select>
                <label class="normal-text bold-text margin-right-small margin-left-normal" >Select X attributes (Press Ctrl to select multiple attributes): </label>
-            <select class="form-control mb-2 mr-sm-2" id="selectX" multiple name="selectX[]" required>
+            <select class="form-control" id="selectX" multiple name="selectX[]" required>
             </select>
+
+            <br>
             <div class="margin-top-normal">
     <button type="button" class="btn btn-primary btn-lg element-center" id="submit" onclick="plotGraph();">Plot</button>
     </div>
@@ -122,6 +124,7 @@ document.getElementById("selectY").disabled=false;
   }
   function loadTrainHead()
   {
+    console.log("Train Head called");
     var xhr = new XMLHttpRequest();
     var url = "http://127.0.0.1:5001/trainHead";
     xhr.open("GET", url, true);
@@ -130,12 +133,16 @@ document.getElementById("selectY").disabled=false;
       if (xhr.readyState === 4 && xhr.status === 200) {
         var json = JSON.parse(xhr.responseText);
         //alert(xhr.responseText);
+          console.log("Train Head loaded");
 
         var data=json.data;
         var metadata=json.metaData;
 
         createTable(data,metadata);
         getAttributes();
+
+
+
       }
     };
     xhr.send();
@@ -143,12 +150,14 @@ document.getElementById("selectY").disabled=false;
   }
   function loadGraphData()
   {
+  console.log("called loadGraphData");
       var xhr = new XMLHttpRequest();
     var url = "http://127.0.0.1:5000/callGraph";
     xhr.open("GET", url, true);
        xhr.onreadystatechange = function () {
       if (xhr.readyState === 4 && xhr.status === 200)
        {
+         console.log("Graph data loaded");
         var json = xhr.responseText;
        loadTrainHead();
 
@@ -159,7 +168,7 @@ document.getElementById("selectY").disabled=false;
   //function to send graph and recieve attributes
 function getAttributes()
 {
-
+  console.log("get Attributes called");
           var xhr = new XMLHttpRequest();
           var url = "http://127.0.0.1:5001/getAttributes";
           xhr.open("GET", url, true);
@@ -168,11 +177,14 @@ function getAttributes()
           {
             if (xhr.readyState === 4 && xhr.status === 200)
             {
+              console.log("Get attributes loaded");
+              document.getElementById("form").style.display="block";
               var json = JSON.parse(xhr.responseText);
               //console.log(xhr2.responseText)
               var x_attr=json.X;
               var y_attr=json.Y;
               selectRowColumn(x_attr,y_attr);
+               showLoading(false);
             }
           };
           xhr.send();
@@ -186,11 +198,22 @@ var selectedValues = [];
     $("#selectX :selected").each(function(){
         x_attr.push($(this).val());
     });
+  console.log("Plot graph called");
   if(graph=="correlation")
   {
   y_attr="None";
   x_attr="None";
   }
+  if(x_attr!="None" && x_attr.length==0)
+  {
+    console.log("X attribute not given");
+  alert("Required X attributes");
+
+
+  }
+  else{
+  showLoading(true);
+
 var form_data = new FormData();
 form_data.append('graph',graph);
 form_data.append('x_attr',x_attr);
@@ -201,17 +224,21 @@ xhr.open("POST", url, true);
 //xhr.setRequestHeader("Content-Type", "application/json");
 xhr.onreadystatechange = function ()
   {
+    console.log("plot graph request made");
     if (xhr.readyState === 4 && xhr.status === 200)
       {
-
+        console.log("Plot graph response recieved");
+  showLoading(false);
 
       }
   };
 xhr.send(form_data);
-
+}
 }
       function init() {
-
+      document.getElementById("form").style.display="none";
+showLoading(true);
+console.log("init: Page loading");
      loadGraphData();
 
       }
