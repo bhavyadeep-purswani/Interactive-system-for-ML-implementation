@@ -79,6 +79,7 @@ def createModel(algorithm,hyperparameters):
         var_smoothing=float(hyperparameters["var_smoothing"])
         mod=GaussianNB(var_smoothing=var_smoothing)
     if algorithm==Algorithms.Neural_Network_Classification:
+        print(hyperparameters["hidden_layer_sizes"],type(hyperparameters["hidden_layer_sizes"]))
         hidden_layer_sizes=int(float(hyperparameters["hidden_layer_sizes"]))
         hidden_layer_sizes=tuple((hidden_layer_sizes,))
         activation=hyperparameters["activation"]

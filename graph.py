@@ -15,10 +15,13 @@ from flask import Flask, request, make_response
 from flask_cors import CORS
 from bokeh.models.annotations import Title
 from bokeh.layouts import gridplot
+from bokeh.embed import components
 from sklearn import preprocessing
 import base64
 from io import BytesIO
 import seaborn as sn
+import numpy as np
+from bokeh.models import Label
 #Global data
 global data
 global graph
@@ -95,69 +98,94 @@ def plotGraph():
     x_attr=request.form['x_attr']
     x_attr=x_attr.split(',')
     mapping=""
-    if(str(data[y_attr].dtype)=="object"):
-        le = preprocessing.LabelEncoder()
-        #data[y_attr]=le.fit_transform(data[y_attr])
-        yattr = le.fit_transform(data[y_attr])
-        le_name_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
-        mapping+="\tMAPPING"
-        for x in le_name_mapping:
-            mapping+=" "+x+":"+str(le_name_mapping[x])
+    html = '<html><head></head><script src="js/importCommonFiles.js" type="text/javascript"></script><script src="https://cdn.bokeh.org/bokeh/release/bokeh-1.4.0.min.js" crossorigin="anonymous"></script>'
+    html += ' <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-1.4.0.min.js" crossorigin="anonymous"></script> '
+    html += '<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-1.4.0.min.js"crossorigin="anonymous"></script>'
+    if y_attr!="None":
+        yattr = data[y_attr]
+        if(str(data[y_attr].dtype)=="object"):
+            le = preprocessing.LabelEncoder()
+            yattr=le.fit_transform(data[[y_attr]])
+            le_name_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
+            mapping+="\n<b>Note : </b>The Y attribute values have been label encoded.</br><b>MAPPING:</b>"
+            for x in le_name_mapping:
+                mapping+="</br>"+x+":"+str(le_name_mapping[x])
 
 
 
     if graph=="bar":
-        p = figure(plot_width=1000, plot_height=1000)
+        p = figure(plot_width=600, plot_height=600)
+
         xlabel=""
         for x in x_attr:
             p.vbar(x=data[x], width=1.5, bottom=0,top=yattr,color=hexColour(),legend=x)
-            xlabel+=" "
+
             xlabel+=x
+            xlabel += " "
         p.xaxis.axis_label =xlabel
         p.yaxis.axis_label = y_attr
         t = Title()
-        t.text = "graph:" + graph + " x:" + xlabel + mapping
+        t.text = "graph:" + graph + " x:" + xlabel
         p.title = t
-        show(p)
+        script, div = components(p)
+        html+='<body><div class="container"><div class="row"><div class="col-5">'+ div +'</div><div class="col-2"></div><div class="col-5">'+mapping+'</div></div></div>'+script +'</body></html>'
+        with open('Web Pages\plottedGraph.html', 'w') as f:
+            f.write(html)
+        webbrowser.open_new_tab('Web Pages\plottedGraph.html')
+
         return "SUCCESS"
     if graph=="scatter":
         p = figure(plot_width=600, plot_height=600)
         for x in x_attr:
             p.scatter(data[x], yattr, marker="x",line_color=hexColour(), fill_color=hexColour(), fill_alpha=0.5, size=12,legend=x)
         t = Title()
-        t.text = "graph:" + graph + " x:" + str(x_attr)+mapping
+        t.text = "graph:" + graph + " x:" + ' '.join(x_attr)
         p.title = t
-        show(p)
+        script, div = components(p)
+        html += '<body><div class="container"><div class="row"><div class="col-5">' + div + '</div><div class="col-2"></div><div class="col-5">' + mapping + '</div></div></div>' + script + '</body></html>'
+        with open('Web Pages\plottedGraph.html', 'w') as f:
+            f.write(html)
+        webbrowser.open_new_tab('Web Pages\plottedGraph.html')
         return "SUCCESS"
     if graph=="line":
         l=[]
+        xlabel=""
         for x in x_attr:
             p = figure(plot_width=600, plot_height=600)
-            p.line(data[x], yattr,color=hexColour(),legend=x)
+
+            p.line(data[x],yattr,color=hexColour(),legend=x)
             p.xaxis.axis_label =x
             p.yaxis.axis_label = y_attr
-            #title = graph + " " + xlabel + " " + y_attr
             t=Title()
-            t.text ="graph:"+graph+" x:"+x+ mapping
+            t.text ="graph:"+graph+" x:"+x
             p.title = t
             l.append(p)
-        print(organizePlots(l))
-        show(gridplot(organizePlots(l)))
+
+        script, divs = components(l)
+        scatterPlot = ""
+        for div in divs:
+            scatterPlot += '<div class="row"><div class="col-5">' + div + '</div><div class="col-2"></div><div class="col-5">' + mapping + '</div></div></br>'
+        html += '<body><div class="container">'+scatterPlot+ script + '</body></html>'
+        with open('Web Pages\plottedGraph.html', 'w') as f:
+           f.write(html)
+        webbrowser.open_new_tab('Web Pages\plottedGraph.html')
+
         return "SUCCESS"
     if graph=="correlation":
 
-        plt.figure()
+        plt.figure(figsize=(12, 18))
         ax=sn.heatmap(data.corr(), square=True, cmap='RdYlGn')
+
         plt.subplots_adjust(bottom=0.30)
         fig=ax.get_figure()
         tmpfile = BytesIO()
         plt.savefig(tmpfile, format='png')
 
         encoded = base64.b64encode(tmpfile.getvalue()).decode('utf-8')
-        html = '<html><body> '+ '<img src=\'data:image/png;base64,{}\'>'.format(encoded) + '</body></html>'
-        with open('correlation map.html', 'w') as f:
+        html = '<html><body>'+ '<img src=\'data:image/png;base64,{}\'>'.format(encoded) + '</body></html>'
+        with open('Web Pages\plottedGraph.html', 'w') as f:
             f.write(html)
-        webbrowser.open_new_tab('correlation map.html')
+        webbrowser.open_new_tab('Web Pages\plottedGraph.html')
         return "SUCCESS"
     
         
