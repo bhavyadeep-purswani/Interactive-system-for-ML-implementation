@@ -160,7 +160,7 @@ function showFullDataset() {
 function createTableCheckboxFullData(data,metaData)
 {
   var tbl=document.createElement('table');
-  var tblDiv = document.getElementById("tableDiv");
+  var tblDiv = document.getElementById("tableDivFullData");
   tblDiv.innerHTML="";
   tbl.style.width = '100%';
   tbl.setAttribute('class', 'table table-bordered table-striped');
@@ -238,10 +238,9 @@ function includeHTML() {
               </button>
             </div>
             <div class="modal-body" id = "fullDataBody">
-            <div id = "dataHead">
-              <div id = "tableDiv">
+            <div id = "dataHeadFullData">
+              <div id = "tableDivFullData">
               </div>
-              <div id="errorMsgTarget" class="error-text margin-top-normal"></div><br>
             </div>
             </div>
             <div class="modal-footer">

@@ -51,6 +51,9 @@ body {
 .inline-text {
   display: inline;
 }
+.align-element-right {
+  float: right;
+}
 #cover-spin {
     position:fixed;
     width:100%;
