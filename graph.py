@@ -165,7 +165,7 @@ def plotGraph():
         scatterPlot = ""
         for div in divs:
             scatterPlot += '<div class="row"><div class="col-5">' + div + '</div><div class="col-2"></div><div class="col-5">' + mapping + '</div></div></br>'
-        html += '<body><div class="container">'+scatterPlot+ script + '</div></body></html>'
+        html += '<body><div class="container">'+scatterPlot+ script + '</body></html>'
         with open('Web Pages\plottedGraph.html', 'w') as f:
            f.write(html)
         webbrowser.open_new_tab('Web Pages\plottedGraph.html')
