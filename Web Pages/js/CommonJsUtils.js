@@ -93,7 +93,7 @@ function makeDownloadRequest(url, formData, method) {
     {
       if (xhr.status === 200) {
         var blob = xhr.response;
-        var fileName = "predictions" + Math.floor(Math.random() * 100) + ".csv";
+        var fileName = "predictions.csv";
         saveBlob(blob, fileName);
       } else {
         if (retryAttempts < 5) {
@@ -136,4 +136,145 @@ function showObject(object) {
 
 function hideObject(object) {
   object.style.display = "none";
+}
+
+function showFullDataset() {
+  var body = document.getElementsByTagName("body")[0];
+  var child = document.createElement("div");
+  child.setAttribute("include-html", "fullDataModel.html");
+  body.appendChild(child);
+  includeHTML();
+  showLoading(true);
+  var url = "http://127.0.0.1:5000/trainData";
+  var callback = function(response) {
+    var json = JSON.parse(response);
+    var data=json.data;
+    var metadata=json.metaData;
+    createTableCheckboxFullData(data,metadata);
+    document.getElementById("showFullDataBtn").click();
+    showLoading(false);
+  };
+  makeRequest(url, null, "GET", callback);
+}
+
+function createTableCheckboxFullData(data,metaData)
+{
+  var tbl=document.createElement('table');
+  var tblDiv = document.getElementById("tableDiv");
+  tblDiv.innerHTML="";
+  tbl.style.width = '100%';
+  tbl.setAttribute('class', 'table table-bordered table-striped');
+  tblDiv.setAttribute('style', "overflow-x:auto; max-height: 500px; overflow-y:auto;");
+  var thead = document.createElement('thead');
+  var tbdy = document.createElement('tbody');
+  var tr = document.createElement('tr');
+  for (var j = 0; j < metaData.length; j++)
+  {
+    var th = document.createElement('th');
+    th.appendChild(document.createTextNode(metaData[j] + " "));
+    if (metaData[j] != "Target") {
+      var input= document.createElement('input');
+      input.setAttribute('type','checkbox');
+      input.setAttribute('name','columnsDeleteFullData[]');
+      input.setAttribute('value',metaData[j]);
+      input.setAttribute('style',"display:inline;");
+      th.appendChild(input);
+    }
+    tr.appendChild(th);
+  }
+  thead.appendChild(tr);
+  tbl.appendChild(thead);
+  for (var i = 0; i < data.length;i++)
+  {
+    var tr = document.createElement('tr');
+    for (var j = 0; j < metaData.length; j++)
+    {
+      var td = document.createElement('td');
+      td.appendChild(document.createTextNode(data[i][j]));
+      tr.appendChild(td)
+    }
+    tbdy.appendChild(tr);
+  }
+  tbl.appendChild(tbdy);
+  tblDiv.appendChild(tbl);
+}
+
+function deleteColumnsFromFullData() {
+  var checkedValue = [];
+  var inputElements = document.getElementsByName('columnsDeleteFullData[]');
+  for(var i=0; inputElements[i]; i++){
+        if(inputElements[i].checked){
+             checkedValue.push(inputElements[i].value);
+        }
+  }
+  if (checkedValue.length != 0) {
+    var url = "http://127.0.0.1:5000/removeColumns";
+    var form_data = new FormData();
+    var callback = function(response) {
+      location.reload();
+    };
+    form_data.append("removeColumns", checkedValue.join(","));
+    makeRequest(url, form_data, "POST", callback);
+  } else {
+    document.getElementById("closeModal").click();
+  }
+}
+
+function includeHTML() {
+  var z, i, elmnt, file, xhttp;
+  z = document.getElementsByTagName("*");
+  for (i = 0; i < z.length; i++) {
+    elmnt = z[i];
+    file = elmnt.getAttribute("include-html");
+    if (file) {
+      elmnt.innerHTML = `<button type="button" style="display:none;" id = "showFullDataBtn" data-toggle="modal" data-target="#fullData">Full Data Model</button>
+      <div class="modal fade" id="fullData" tabindex="-1" role="dialog" aria-labelledby="fullDataLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="fullDataLabel">Train Dataset</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" id = "fullDataBody">
+            <div id = "dataHead">
+              <div id = "tableDiv">
+              </div>
+              <div id="errorMsgTarget" class="error-text margin-top-normal"></div><br>
+            </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" id = "closeModal" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-danger" onclick = "deleteColumnsFromFullData();">Delete Columns</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+      elmnt.removeAttribute("include-html");
+      includeHTML();
+      return;
+    }
+  }
+
+  function deleteColumnsFromFullData() {
+    var checkedValue = [];
+    var inputElements = document.getElementsByName('columnsDeleteFullData[]');
+    for(var i=0; inputElements[i]; i++){
+          if(inputElements[i].checked){
+               checkedValue.push(inputElements[i].value);
+          }
+    }
+    if (checkedValue.length != 0) {
+      var url = "http://127.0.0.1:5000/removeColumns";
+      var form_data = new FormData();
+      var callback = function(response) {
+        location.reload();
+      };
+      form_data.append("removeColumns", checkedValue.join(","));
+      makeRequest(url, form_data, "POST", labelEncodeColumns);
+    } else {
+      document.getElementById("closeModal").click();
+    }
+  }
 }

@@ -55,10 +55,10 @@ def trainHead():
 
 
 # Function to return the complete of dataframe
-@app.route('/trainHead', methods=['GET'])
+@app.route('/trainData', methods=['GET'])
 def trainDataset():
-    global dataset
-    r = fullFile(dataset)
+    global dataset, targetData
+    r = fullFile(dataset, targetData)
     return r
 
 
@@ -245,6 +245,8 @@ def labelEncodeColumns():
 def getNullValue():
     global dataset
     column = request.form['columnName']
+    if column not in dataset.columns:
+        return "False"
     if containsNull(dataset[column]):
         return "True"
     else:
