@@ -15,7 +15,6 @@ from modules.utilities import strToBool
 #function to create MachineLearning Model
 def createModel(algorithm,hyperparameters):
     HYPERPARAMETERS = json.loads(open(HYPERPARAMETERSFILE, "r").read())
-    print(type(HYPERPARAMETERS))
     if algorithm==Algorithms.Linear_Regression:
         fit_intercept= strToBool(hyperparameters["fit_intercept"])
         mod=LinearRegression(fit_intercept=fit_intercept)
@@ -25,8 +24,8 @@ def createModel(algorithm,hyperparameters):
             max_depth=None
         else:
             max_depth=int(float(hyperparameters["max_depth"]))
-        min_samples_split=float(hyperparameters["min_samples_split"])
-        min_samples_leaf=float(hyperparameters["min_samples_leaf"])
+        min_samples_split=int(float(hyperparameters["min_samples_split"]))
+        min_samples_leaf=int(float(hyperparameters["min_samples_leaf"]))
         max_features=hyperparameters["max_features"]
         if(max_features not in HYPERPARAMETERS[Algorithms.Random_Forrest_Classifier]["max_features"]["options"]  ):
             max_features=int(float(max_features))
@@ -41,7 +40,7 @@ def createModel(algorithm,hyperparameters):
             max_depth = None
         else:
             max_depth = int(float(hyperparameters["max_depth"]))
-        min_samples_leaf=float(hyperparameters["min_samples_leaf"])
+        min_samples_leaf=int(float(hyperparameters["min_samples_leaf"]))
         if min_samples_leaf == int(min_samples_leaf):
             min_samples_leaf = int(min_samples_leaf)
         max_features=hyperparameters["max_features"]
@@ -55,7 +54,7 @@ def createModel(algorithm,hyperparameters):
     if algorithm==Algorithms.KNeighbors_Classifier:
         n_neighbors=int(float(hyperparameters["n_neighbors"]))
         weights=hyperparameters["weights"]
-        algorithmK=hyperparameters["algorithm"]
+        algorithmK=hyperparameters["nearest neighbors algorithm"]
         leaf_size=int(float(hyperparameters["leaf_size"]))
         mod=KNeighborsClassifier(n_neighbors=n_neighbors,weights=weights,algorithm=algorithmK,leaf_size=leaf_size)
     if algorithm==Algorithms.SVM_Classification:
@@ -80,6 +79,7 @@ def createModel(algorithm,hyperparameters):
         var_smoothing=float(hyperparameters["var_smoothing"])
         mod=GaussianNB(var_smoothing=var_smoothing)
     if algorithm==Algorithms.Neural_Network_Classification:
+        print(hyperparameters["hidden_layer_sizes"],type(hyperparameters["hidden_layer_sizes"]))
         hidden_layer_sizes=int(float(hyperparameters["hidden_layer_sizes"]))
         hidden_layer_sizes=tuple((hidden_layer_sizes,))
         activation=hyperparameters["activation"]

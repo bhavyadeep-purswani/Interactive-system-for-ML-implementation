@@ -37,6 +37,19 @@ def fileHead(df):
     return r
 
 
+def fullFile(df, td):
+    df=df.fillna("null")
+    df["Target"] = td.values
+    displayData=df.values.tolist()
+    metadata=list(df.columns)
+    df.drop(['Target'], axis=1, inplace=True)
+    responseData={"data":displayData,"metaData":metadata}
+    responseData=json.dumps(responseData,ensure_ascii=True,allow_nan=True)
+    r = make_response(responseData)
+    r.mimetype = 'text/plain'
+    return r
+
+
 def fileHeadFiltered(df, columnNames):
     df=df.fillna("null")
     columns = columnNames.split(",")

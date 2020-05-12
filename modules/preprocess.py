@@ -84,6 +84,15 @@ def labelEncode(data, enc):
         return data
 
 
+def fix_unknown_values(data, le_dict,labelEncoder):
+    unique = list(set(data))
+    maxval= max(list(le_dict.values()))
+    for x in unique:
+        if x not in le_dict:
+            maxval = maxval + 1
+            le_dict[x] = maxval
+    return [le_dict[k] for k in data]
+
 # Function to One hot Encode Column
 def oneHotEncode(data, enc):
     data = data.applymap(str)
