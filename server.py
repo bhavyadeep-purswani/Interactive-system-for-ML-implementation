@@ -24,6 +24,8 @@ from modules.preprocess import standardizeData, containsNull, fillCustom, fillMe
     dropNullRows, fillForward, fillBackward, labelEncode, oneHotEncode, getNumberOfNullValues
 from modules.utilities import strToBool, checkForStrings, fetchPreProcessData, appendAllNulls
 
+import graph
+
 # global variables
 global trainFileName
 global dataset
@@ -35,6 +37,7 @@ global mod
 global modFit
 global predictedData
 global params
+isGraphServerRunning = False
 
 # params={}
 # preprocessingActions = "from modules.preprocess import *\nimport server\nimport pandas as pd\ndef preprocess(params):\n\tdataset=params['dataset']"
@@ -322,14 +325,17 @@ def callGraph():
 
 
 def newFunc():
-    os.system("python graph.py")
+    graph.runGraphServer()
 
 
 @app.route('/graphModule')
 def graphModule():
-    # t1 = threading.Thread(target=newFunc)
-    # t1.start()
-    # time.sleep(10)
+    global isGraphServerRunning
+    if not isGraphServerRunning:
+        isGraphServerRunning = True
+        t1 = threading.Thread(target=newFunc)
+        t1.start()
+        time.sleep(10)
     webbrowser.open_new_tab("Web Pages\graph.html")
     return "SUCCESS"
 

@@ -187,13 +187,10 @@ def plotGraph():
             f.write(html)
         webbrowser.open_new_tab('Web Pages\plottedGraph.html')
         return "SUCCESS"
-    
-        
-        
-        
 
 
+def runGraphServer():
+    app.run(host='127.0.0.1', port= 5001)
 
-    
-app.run(host='127.0.0.1', port= 5001)
+
 

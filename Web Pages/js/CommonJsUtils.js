@@ -138,6 +138,21 @@ function hideObject(object) {
   object.style.display = "none";
 }
 
+function openGraph() {
+  showLoading(true);
+  var url = "http://127.0.0.1:5000/graphModule";
+  var callback = function(response) {
+    showLoading(false);
+  };
+  makeRequest(url, null, "GET", callback);
+}
+
+function showSnackbar() {
+  var x = document.getElementById("snackbar");
+  x.className = "show";
+  setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+
 function showFullDataset() {
   var body = document.getElementsByTagName("body")[0];
   var child = document.createElement("div");
@@ -271,7 +286,7 @@ function includeHTML() {
         location.reload();
       };
       form_data.append("removeColumns", checkedValue.join(","));
-      makeRequest(url, form_data, "POST", labelEncodeColumns);
+      makeRequest(url, form_data, "POST", callback);
     } else {
       document.getElementById("closeModal").click();
     }
