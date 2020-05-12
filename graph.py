@@ -81,6 +81,7 @@ def graphType():
     global graph
     y_attr=list(data.columns)
     x_attr=list(data.columns)
+    x_attr.pop()
     responseData={"X":x_attr,"Y":y_attr}
     responseData=json.dumps(responseData,ensure_ascii=True,allow_nan=True)
     r = make_response(responseData)

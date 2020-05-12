@@ -316,6 +316,9 @@ def callGraph():
     graphDataset = pd.concat([dataset, targetData], axis=1)
     graphData = graphDataset.values.tolist()
     graphMetaData = list(graphDataset.columns)
+    for x in range(len(graphMetaData)):
+        if type(graphMetaData[x])==tuple:
+            graphMetaData[x]=str(graphMetaData[x][0])
     requestData = {'graphData': graphData, 'graphMetaData': graphMetaData}
     # requestData=json.dumps(requestData,ensure_ascii=True,allow_nan=True)
 
